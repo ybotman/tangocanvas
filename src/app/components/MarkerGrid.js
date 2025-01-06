@@ -12,7 +12,10 @@ import {
 } from "@mui/material";
 
 /**
- * Each bar has {id, label, start, end, sectionLabel, sectionId, sectionType}.
+ * Updated:
+ *  - Each row now shows 8 bars in one row.
+ *  - Smaller MUI buttons with label = just the bar number.
+ *  - Removed vertical dashed line/separator.
  */
 export default function MarkerGrid({ sections, onPlayBar }) {
   const [activeMarkerId, setActiveMarkerId] = useState(null);
@@ -39,6 +42,17 @@ export default function MarkerGrid({ sections, onPlayBar }) {
     };
   }, [activeMarkerId]);
 
+  /**
+   * Break an array into chunks of size "chunkSize"
+   */
+  function chunkArray(arr, chunkSize) {
+    const result = [];
+    for (let i = 0; i < arr.length; i += chunkSize) {
+      result.push(arr.slice(i, i + chunkSize));
+    }
+    return result;
+  }
+
   const handleBarClick = (bar) => {
     setActiveMarkerId(bar.id);
     onPlayBar(bar);
@@ -52,47 +66,45 @@ export default function MarkerGrid({ sections, onPlayBar }) {
         All Bars (3 Sections × 32 bars each = 96 total)
       </Typography>
 
-      {sections.map((section) => (
-        <Box key={section.id} sx={{ mb: 3 }}>
-          {/* Horizontal Divider to label each new section */}
-          <Divider sx={{ my: 2 }}>
-            <Typography variant="subtitle1" sx={{ color: "gray" }}>
-              {section.label} [{section.type}]
-            </Typography>
-          </Divider>
+      {sections.map((section) => {
+        // chunk each section's 32 markers into 4 rows of 8
+        const chunked = chunkArray(section.markers, 8);
 
-          {/* 32 bars in an 8×4 grid */}
-          <Grid container spacing={1}>
-            {section.markers.map((bar, idx) => {
-              // We'll add a right border after columns 4, 12, 20, 28, ... 
-              // i.e. if ( (idx+1) % 8 === 4 ), we put a border
-              // But we only want 8 columns total, so let's see how that lines up:
-              // Actually simpler: (idx % 8 === 3) => place border
-              const col = idx % 8; 
-              const borderRight = col === 3 ? "2px dashed #aaa" : "none";
+        return (
+          <Box key={section.id} sx={{ mb: 3 }}>
+            {/* Horizontal Divider + label */}
+            <Divider sx={{ my: 2 }}>
+              <Typography variant="subtitle1" sx={{ color: "gray" }}>
+                {section.label} [{section.type}]
+              </Typography>
+            </Divider>
 
-              return (
-                <Grid item xs={3} key={bar.id}>
-                  <Button
-                    variant={
-                      bar.id === activeMarkerId ? "contained" : "outlined"
-                    }
-                    color={bar.id === activeMarkerId ? "secondary" : "primary"}
-                    onClick={() => handleBarClick(bar)}
-                    fullWidth
-                    sx={{
-                      borderRight,
-                      borderRadius: 0 // so dashed line looks continuous
-                    }}
-                  >
-                    {bar.label}
-                  </Button>
-                </Grid>
-              );
-            })}
-          </Grid>
-        </Box>
-      ))}
+            {chunked.map((rowBars, rowIdx) => (
+              <Grid container spacing={1} key={rowIdx} sx={{ mb: 2 }}>
+                {rowBars.map((bar) => {
+                  // label is just the number, e.g., "Bar 7" => "7"
+                  const barNumber = bar.label.replace("Bar ", "");
+
+                  return (
+                    <Grid item xs={1} sm={1} md={1} key={bar.id}>
+                      <Button
+                        variant={
+                          bar.id === activeMarkerId ? "contained" : "outlined"
+                        }
+                        size="small"
+                        onClick={() => handleBarClick(bar)}
+                        fullWidth
+                      >
+                        {barNumber}
+                      </Button>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            ))}
+          </Box>
+        );
+      })}
 
       {/* If a bar is playing, show progress */}
       {activeMarkerId && (

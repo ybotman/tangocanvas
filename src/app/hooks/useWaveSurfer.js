@@ -4,9 +4,13 @@ import { useRef, useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import WaveSurfer from "wavesurfer.js";
 
+/**
+ * Updated: manually pause after snippetDuration so it truly stops.
+ */
 export default function useWaveSurfer({ containerRef }) {
   const waveSurferRef = useRef(null);
   const [isReady, setIsReady] = useState(false);
+  const snippetTimeoutRef = useRef(null);
 
   // 1) Initialize
   const initWaveSurfer = useCallback(() => {
@@ -35,13 +39,35 @@ export default function useWaveSurfer({ containerRef }) {
     waveSurferRef.current.load(url);
   }, []);
 
-  // 3) Play a snippet (4.5s)
+  // 3) Play a snippet manually and then pause
   const playSnippet = useCallback(
     (startSec, snippetDuration = 4.5) => {
       if (!waveSurferRef.current || !isReady) return;
-      // waveSurfer 7+ can do .play(start, end)
-      waveSurferRef.current.setVolume(1.0);
-      waveSurferRef.current.play(startSec, startSec + snippetDuration);
+
+      // Clear any previous timeout
+      if (snippetTimeoutRef.current) {
+        clearTimeout(snippetTimeoutRef.current);
+        snippetTimeoutRef.current = null;
+      }
+
+      const ws = waveSurferRef.current;
+      ws.setVolume(1.0);
+
+      // Ensure we're not out of bounds
+      const totalDur = ws.getDuration();
+      if (startSec >= totalDur) return;
+
+      // Seek & play
+      ws.pause();
+      ws.seekTo(startSec / totalDur);
+      ws.play();
+
+      // Manually pause after snippetDuration
+      snippetTimeoutRef.current = setTimeout(() => {
+        if (waveSurferRef.current) {
+          waveSurferRef.current.pause();
+        }
+      }, snippetDuration * 1000);
     },
     [isReady]
   );
@@ -51,13 +77,12 @@ export default function useWaveSurfer({ containerRef }) {
     (startSec, totalDuration, barsToShow = 3) => {
       if (!waveSurferRef.current || !isReady) return;
 
-      // each bar ~3s => if we show 3 bars, that's ~9s wide
+      // each bar ~3s => 3 bars => ~9s wide
       const widthSec = barsToShow * 3; 
-      // waveSurfer .zoom() => pixels-per-second
       const PPS = 30; 
       waveSurferRef.current.zoom(PPS);
 
-      // try to center startSec in that 9s window
+      // Center startSec in the 9s window
       const halfSpan = widthSec / 2; 
       let centerTime = startSec + halfSpan;
       if (centerTime > totalDuration) centerTime = totalDuration;
@@ -70,6 +95,10 @@ export default function useWaveSurfer({ containerRef }) {
 
   // 5) Cleanup
   const cleanupWaveSurfer = useCallback(() => {
+    if (snippetTimeoutRef.current) {
+      clearTimeout(snippetTimeoutRef.current);
+      snippetTimeoutRef.current = null;
+    }
     if (waveSurferRef.current) {
       waveSurferRef.current.destroy();
       waveSurferRef.current = null;
