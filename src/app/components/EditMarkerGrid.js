@@ -10,16 +10,28 @@ export default function EditMarkerGrid({
   onAdjustBarTime,
   onPlayBar,
 }) {
+  /**
+   * handleShift => called when user clicks ±0.1
+   *   - if bar is "bar-1" => do nothing (cannot shift)
+   *   - else => call onAdjustBarTime(bar.id, delta)
+   */
   const handleShift = (bar, delta) => {
+    // If this is bar-1 (i.e. the first bar in the entire track), do nothing
+    if (bar.id === "bar-1") {
+      console.info("Bar 1 cannot shift. Ignoring request.");
+      return;
+    }
     onAdjustBarTime(bar.id, delta);
   };
 
+  /**
+   * handlePlay => bar label is now a button to snippet-play from bar.start..bar.end
+   *   - or up to nextBar.start if you prefer that approach
+   */
   const handlePlay = (bar, nextBar) => {
     if (nextBar) {
-      // play from bar.start → nextBar.start
       onPlayBar(bar.start, nextBar.start);
     } else {
-      // last bar => bar.start → bar.end
       onPlayBar(bar.start, bar.end);
     }
   };
@@ -40,6 +52,8 @@ export default function EditMarkerGrid({
           <Grid container spacing={1}>
             {section.markers.map((bar, idx) => {
               const nextBar = section.markers[idx + 1] || null;
+              const isBar1 = bar.id === "bar-1";
+
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={bar.id}>
                   <Box
@@ -52,9 +66,20 @@ export default function EditMarkerGrid({
                       gap: 0.5,
                     }}
                   >
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    {/* Instead of plain text, we make the bar label a button for playback */}
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => handlePlay(bar, nextBar)}
+                      sx={{ 
+                        textTransform: "none", 
+                        fontWeight: "bold", 
+                        justifyContent: "flex-start" 
+                      }}
+                    >
                       {bar.label}
-                    </Typography>
+                    </Button>
+
                     <Typography variant="body2">
                       Start: {bar.start.toFixed(2)}s
                     </Typography>
@@ -62,33 +87,25 @@ export default function EditMarkerGrid({
                       End: {bar.end.toFixed(2)}s
                     </Typography>
 
-                    {/* SHIFT Buttons */}
-                    <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleShift(bar, -0.1)}
-                      >
-                        -0.1s
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleShift(bar, 0.1)}
-                      >
-                        +0.1s
-                      </Button>
-                    </Box>
-
-                    {/* PLAY Button */}
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{ mt: 1 }}
-                      onClick={() => handlePlay(bar, nextBar)}
-                    >
-                      Play
-                    </Button>
+                    {/* SHIFT Buttons (hidden if bar-1) */}
+                    {!isBar1 && (
+                      <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleShift(bar, -0.1)}
+                        >
+                          -0.1s
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleShift(bar, 0.1)}
+                        >
+                          +0.1s
+                        </Button>
+                      </Box>
+                    )}
                   </Box>
                 </Grid>
               );

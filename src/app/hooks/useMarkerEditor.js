@@ -1,3 +1,4 @@
+// src/app/hooks/useMarkerEditor.js
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
@@ -11,6 +12,59 @@ export default function useMarkerEditor(songData) {
       setSections(JSON.parse(JSON.stringify(songData.sections)));
     }
   }, [songData]);
+
+  /**
+   * adjustBarTime(barId, delta):
+   *   1) If barId === "bar-1", we do nothing (bar 1 always starts at 0).
+   *   2) Else, shift bar i’s start by delta => new end = new start + oldLength.
+   *   3) Set bar (i-1).end = bar i.start (removing gap/overlap).
+   *   4) Forward ripple => bar (i+1)... remain contiguous.
+   */
+  const adjustBarTime = useCallback((barId, delta) => {
+    setSections((prevSections) => {
+      const newSecs = JSON.parse(JSON.stringify(prevSections));
+
+      for (const sec of newSecs) {
+        const markers = sec.markers;
+        for (let i = 0; i < markers.length; i++) {
+          const bar = markers[i];
+          if (bar.id === barId) {
+            // 1) If bar-1 => do nothing, return
+            if (barId === "bar-1") {
+              console.info("Bar 1 cannot shift. Aborting shift.");
+              return newSecs;
+            }
+
+            // 2) shift this bar's start
+            const oldLen = bar.end - bar.start;
+            bar.start += delta;
+            bar.end = bar.start + oldLen;
+
+            // 3) "Back ripple" => set bar i-1’s end = bar i.start
+            //    only if i > 0
+            if (i > 0) {
+              const prevBar = markers[i - 1];
+              prevBar.end = bar.start;
+              // We do NOT change prevBar.start => so bar i-1 might lengthen or shrink
+            }
+
+            // 4) “Forward ripple” => bar i+1.. must remain contiguous
+            //    i.e., each next bar’s start = previous bar’s end
+            let currentEnd = bar.end;
+            for (let j = i + 1; j < markers.length; j++) {
+              const nb = markers[j];
+              const nbLen = nb.end - nb.start;
+              nb.start = currentEnd;
+              nb.end = nb.start + nbLen;
+              currentEnd = nb.end;
+            }
+            return newSecs; // Done
+          }
+        }
+      }
+      return newSecs;
+    });
+  }, []);
 
   /**
    * applyNewBarLengthAfterBar(barId, newLen):
@@ -79,35 +133,7 @@ export default function useMarkerEditor(songData) {
       return newSecs;
     });
   }, []);
-
-  const adjustBarTime = useCallback((barId, delta) => {
-    setSections((prevSections) => {
-      const newSecs = JSON.parse(JSON.stringify(prevSections));
-
-      for (const sec of newSecs) {
-        for (let i = 0; i < sec.markers.length; i++) {
-          const bar = sec.markers[i];
-          if (bar.id === barId) {
-            const oldLength = bar.end - bar.start;
-            bar.start += delta;
-            bar.end = bar.start + oldLength;
-
-            // ripple subsequent bars
-            let currentEnd = bar.end;
-            for (let j = i + 1; j < sec.markers.length; j++) {
-              const nb = sec.markers[j];
-              const nbLen = nb.end - nb.start;
-              nb.start = currentEnd;
-              nb.end = nb.start + nbLen;
-              currentEnd = nb.end;
-            }
-            return newSecs; // Return early, once the bar is found/updated
-          }
-        }
-      }
-      return newSecs;
-    });
-  }, []);
+  
   /**
    * finalizeAndGetJSON => merges local sections back into the original
    */
