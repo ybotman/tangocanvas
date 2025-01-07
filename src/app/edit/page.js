@@ -1,21 +1,26 @@
 "use client";
 
-import React, { useRef, useCallback, useState, useEffect } from "react";
-import { Box, Typography, Button, Slider } from "@mui/material";
-import HiddenSnippetPlayer from "@/components/HiddenSnippetPlayer";
-import WaveformEditorNoRegions from "@/components/WaveformEditorNoRegions";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Box, Typography, Button, Slider, TextField } from "@mui/material";
+import SnippetWaveSurfer from "@/components/SnippetWaveSurfer";
 import EditMarkerGrid from "@/components/EditMarkerGrid";
 import useMarkerEditor from "@/hooks/useMarkerEditor";
 import { downloadJSONFile } from "@/utils/jsonHandler";
+import { useRouter } from "next/navigation";
+import styles from "./EditPage.module.css";
 
 export default function EditPage() {
-  const snippetPlayerRef = useRef(null);
-
-  // Local state for the fetched JSON
+  const waveSurferRef = useRef(null);
   const [songData, setSongData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount, fetch the markers JSON from public/markers/Amarras-markers.json
+  // We have 2 inputs:
+  // 1) The bar length in seconds (with .1 steps).
+  // 2) The "After Bar" text input, e.g., "12" => bar-12.
+  const [barLenSeconds, setBarLenSeconds] = useState(3.0);
+  const [afterBarNum, setAfterBarNum] = useState("");
+
+  // Fetch markers
   useEffect(() => {
     async function loadMarkers() {
       try {
@@ -24,7 +29,6 @@ export default function EditPage() {
           throw new Error(`Failed to fetch markers: ${resp.status}`);
         }
         const data = await resp.json();
-        // data should have { songId, title, duration, sections: [...] }
         setSongData(data);
       } catch (err) {
         console.error("Error fetching marker data:", err);
@@ -35,28 +39,64 @@ export default function EditPage() {
     loadMarkers();
   }, []);
 
-    
-  // Use the markerEditor hook (it will handle bar shifting, etc.)
-  // If songData is still null, pass an empty object
-  const {
-    sections,
-    adjustBarTime,
-    defaultBarLength,
-    setDefaultBarLength,
-    finalizeAndGetJSON,
-  } = useMarkerEditor(songData || {});
+  // Our marker editing hook
+  const { sections, finalizeAndGetJSON, applyNewBarLengthAfterBar,adjustBarTime } =
+    useMarkerEditor(songData || {});
 
-  // For snippet playback
-const handlePlayBar = useCallback((start, end) => {
-  snippetPlayerRef.current?.playSnippet(start, end);
-}, []);
+  // Snippet playback (play bar from start..end)
+  const handlePlayBar = useCallback((start, end) => {
+    waveSurferRef.current?.playSnippet(start, end);
+  }, []);
 
+  const handleSave = async () => {
+    const updated = finalizeAndGetJSON();
+    if (!updated) return;
 
-  // Save updated JSON
-  const handleSave = () => {
+    try {
+      // Post to /api/markers
+      const resp = await fetch("/api/markers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      const result = await resp.json();
+      if (!resp.ok) {
+        throw new Error(result.error || "Failed to save markers");
+      }
+
+      console.log("Markers saved to public/markers, with versioning:", result);
+      // Optionally navigate or show a success message
+      // router.push("/play") or similar
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("Failed to save markers. Check console for details.");
+    }
+  };
+
+  const handleSaveOld = () => {
     const updated = finalizeAndGetJSON();
     if (!updated) return;
     downloadJSONFile(updated, `${updated.songId || "Song"}_edited.json`);
+  };
+
+  // Apply new bar length
+  const handleApplyBarLen = () => {
+    // e.g., if user typed "12", we do "bar-12"
+    const barId = `bar-${afterBarNum}`;
+    if (!afterBarNum) {
+      console.warn("No bar number typed in the text field!");
+      return;
+    }
+    console.info(
+      "Applying new bar length from",
+      barId,
+      "with length:",
+      barLenSeconds,
+    );
+
+    // Convert barLenSeconds to a number with single decimal:
+    const roundedLen = parseFloat(barLenSeconds.toFixed(1));
+    applyNewBarLengthAfterBar(barId, roundedLen);
   };
 
   if (loading) {
@@ -67,49 +107,56 @@ const handlePlayBar = useCallback((start, end) => {
   }
 
   return (
-    <Box sx={{ p: 2, maxWidth: 900, mx: "auto" }}>
-      {/* Hidden snippet player (headless WaveSurfer instance) */}
-      <HiddenSnippetPlayer
-        audioUrl="/audio/Amarras.mp3" 
-        ref={snippetPlayerRef}
-      />
-
-      <Typography variant="h4" gutterBottom>
-        Edit Page (No Regions)
-      </Typography>
-
-      {/* 1) Slider for default bar length (1–6s, step=0.1) */}
-      <Box sx={{ mb: 3 }}>
-        <Typography gutterBottom>
-          Default Bar Length: {defaultBarLength.toFixed(1)} sec
+    <div className={styles.container}>
+      <div className={styles.topSection}>
+        <Typography variant="h4" gutterBottom>
+          Edit Page (Rounded Cascade)
         </Typography>
-        <Slider
-          min={1}
-          max={6}
-          step={0.1}
-          value={defaultBarLength}
-          onChange={(_, newVal) => setDefaultBarLength(newVal)}
-          sx={{ width: 300 }}
-        />
-      </Box>
 
-      {/* 2) Basic wave display (read-only) */}
-      <WaveformEditorNoRegions audioUrl="/audio/Amarras.mp3" />
+        {/* 1) Slider for bar length */}
+        <Box sx={{ mb: 2 }}>
+          <Typography gutterBottom>
+            Bar Length: {barLenSeconds.toFixed(1)} sec
+          </Typography>
+          <Slider
+            min={0.1}
+            max={12}
+            step={0.1}
+            value={barLenSeconds}
+            onChange={(_, val) => setBarLenSeconds(val)}
+            sx={{ width: 250 }}
+          />
+        </Box>
 
-      {/* 3) Manual ±0.1s shifts + snippet "Play" button */}
-      <EditMarkerGrid
-        sections={sections}
-        onAdjustBarTime={adjustBarTime}
-        onPlayBar={handlePlayBar}
-      />
-<HiddenSnippetPlayer
-  audioUrl="/audio/Amarras.mp3"
-  ref={snippetPlayerRef}
-/>;
-      {/* 4) Save to updated JSON */}
-      <Button variant="contained" sx={{ mt: 2 }} onClick={handleSave}>
-        Save Markers
-      </Button>
-    </Box>
+        {/* 2) Text input for bar ID number (like "12" => bar-12) */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="After Bar Number"
+            variant="outlined"
+            size="small"
+            value={afterBarNum}
+            onChange={(e) => setAfterBarNum(e.target.value)}
+            sx={{ mr: 2 }}
+          />
+          <Button variant="contained" onClick={handleApplyBarLen}>
+            Apply
+          </Button>
+        </Box>
+
+        <SnippetWaveSurfer audioUrl="/audio/Amarras.mp3" ref={waveSurferRef} />
+
+        <Button variant="contained" sx={{ mt: 3 }} onClick={handleSave}>
+          Save Markers
+        </Button>
+      </div>
+
+      {/* SCROLLABLE BARS */}
+      <div className={styles.barsScroll}>
+        <EditMarkerGrid
+          sections={sections}
+          onAdjustBarTime={adjustBarTime}
+          onPlayBar={handlePlayBar} />
+      </div>
+    </div>
   );
 }

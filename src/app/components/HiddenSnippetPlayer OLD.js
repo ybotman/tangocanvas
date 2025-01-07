@@ -47,10 +47,10 @@ function HiddenSnippetPlayerInner({ audioUrl }, ref) {
       // Cleanup
       if (waveRef.current) {
         try {
-          waveRef.current.destroy();
+          waveRef.current?.destroy();
         } catch (err) {
           if (err.name !== "AbortError") {
-            console.error("WaveSurfer destroy error:", err);
+            console.error("Destroy error:", err);
           }
         }
         waveRef.current = null;
@@ -70,28 +70,6 @@ function HiddenSnippetPlayerInner({ audioUrl }, ref) {
     }
   }, [audioUrl]);
 
-  // Provide a function for parent to call => waveRef.current.playSnippet
-  const playSnippet = useCallback((startSec, endSec) => {
-    if (!waveRef.current || !ready) return;
-    const ws = waveRef.current;
-    const totalDur = ws.getDuration();
-    if (startSec >= totalDur) return;
-
-    ws.stop();
-    ws.seekTo(startSec / totalDur);
-    ws.setVolume(1.0);
-    ws.play();
-
-    const snippetLen = endSec - startSec;
-    const fadeTime = 0.5;
-    const playTime = (snippetLen - fadeTime) * 1000;
-
-    // optional fade out
-    setTimeout(() => {
-      fadeVolume(1.0, 0.0, fadeTime, () => ws.pause());
-    }, playTime);
-  }, [ready]);
-
   const fadeVolume = useCallback((fromVol, toVol, durationSec, callback) => {
     const steps = 15;
     const stepTime = (durationSec * 1000) / steps;
@@ -109,6 +87,30 @@ function HiddenSnippetPlayerInner({ audioUrl }, ref) {
       }
     }, stepTime);
   }, []);
+  // Provide a function for parent to call => waveRef.current.playSnippet
+  const playSnippet = useCallback(
+    (startSec, endSec) => {
+      if (!waveRef.current || !ready) return;
+      const ws = waveRef.current;
+      const totalDur = ws.getDuration();
+      if (startSec >= totalDur) return;
+
+      ws.stop();
+      ws.seekTo(startSec / totalDur);
+      ws.setVolume(1.0);
+      ws.play();
+
+      const snippetLen = endSec - startSec;
+      const fadeTime = 0.5;
+      const playTime = (snippetLen - fadeTime) * 1000;
+
+      // optional fade out
+      setTimeout(() => {
+        fadeVolume(1.0, 0.0, fadeTime, () => ws.pause());
+      }, playTime);
+    },
+    [ready, fadeVolume],
+  );
 
   // Expose methods via "useImperativeHandle"
   useImperativeHandle(ref, () => ({

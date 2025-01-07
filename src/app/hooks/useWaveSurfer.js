@@ -103,7 +103,13 @@ export default function useWaveSurfer({ containerRef }) {
       snippetTimeoutRef.current = null;
     }
     if (waveSurferRef.current) {
-      waveSurferRef.current.destroy();
+      try {
+        waveRef.current?.destroy();
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Destroy error:", err);
+        }
+      }
       waveSurferRef.current = null;
     }
     setIsReady(false);

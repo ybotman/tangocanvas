@@ -1,113 +1,68 @@
-//----------------------------------------------------------------
-// src/app/edit/components/WaveformEditor.js
-//----------------------------------------------------------------
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
-import { Box } from "@mui/material";
+import React, { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import dynamic from "next/dynamic";
+import WaveSurfer from "wavesurfer.js";
 
-// Force dynamic import so Next doesn't SSR
-// Also import the ESM version of the plugin explicitly
-const WaveSurfer = dynamic(() => import("wavesurfer.js"), { ssr: false });
-const RegionsPlugin = dynamic(
-  () => import("wavesurfer.js/dist/plugins/regions.esm.js"),
-  { ssr: false },
-);
-
-export default function WaveformEditor({
-  sections,
-  audioUrl,
-  onBarRegionUpdate,
-}) {
+/**
+ * A simple WaveSurfer display that DOES NOT use RegionsPlugin.
+ * The wave is purely for reference.
+ */
+export default function WaveformEditor({ audioUrl, onReady }) {
+  const waveRef = useRef(null);
   const containerRef = useRef(null);
-  const waveSurferRef = useRef(null);
 
-  const initWaveSurfer = useCallback(async () => {
-    if (!containerRef.current || waveSurferRef.current) return;
+  useEffect(() => {
+    if (!containerRef.current) return;
+    if (waveRef.current) return;
 
-    // "await" the dynamic imports so we actually get the plugin classes
-    const [WS, RP] = await Promise.all([WaveSurfer, RegionsPlugin]);
-
-    waveSurferRef.current = WS.create({
+    // Create a basic WaveSurfer instance
+    waveRef.current = WaveSurfer.create({
       container: containerRef.current,
       waveColor: "#999",
       progressColor: "#f50057",
       cursorColor: "#333",
       backend: "WebAudio",
       height: 150,
-      fillParent: true,
       scrollParent: false,
-      plugins: [
-        RP.create({
-          drag: true,
-          resize: false,
-        }),
-      ],
+      responsive: true,
     });
 
-    waveSurferRef.current.on("error", (err) => {
+    waveRef.current.on("error", (err) => {
       if (err.name === "AbortError") {
-        console.info("WaveSurfer fetch aborted - ignoring...");
-        return;
+        console.info("WaveSurfer fetch aborted (ignore).");
+      } else {
+        console.error("WaveSurfer error:", err);
       }
-      console.error("WaveSurfer error:", err);
     });
 
-    waveSurferRef.current.load(audioUrl);
+    // Load the audio
+    waveRef.current.load(audioUrl);
 
-    waveSurferRef.current.on("ready", () => {
-      // Dynamically create regions for each bar
-      sections.forEach((section) => {
-        section.markers.forEach((bar) => {
-          waveSurferRef.current.addRegion({
-            id: bar.id,
-            start: bar.start,
-            end: bar.end,
-            color: "rgba(100,150,255,0.2)",
-            drag: true,
-            resize: false,
-          });
-        });
-      });
+    // Fire onReady once wave is fully loaded
+    waveRef.current.on("ready", () => {
+      if (onReady) onReady(waveRef.current);
     });
 
-    waveSurferRef.current.on("region-update-end", (region) => {
-      onBarRegionUpdate(region.id, region.start);
-    });
-
-    waveSurferRef.current.on("region-click", (region, e) => {
-      e.stopPropagation();
-      const snippetDuration = Math.min(region.end - region.start, 4.5);
-      waveSurferRef.current.play(region.start, region.start + snippetDuration);
-    });
-  }, [audioUrl, sections, onBarRegionUpdate]);
-
-  const cleanupWaveSurfer = useCallback(() => {
-    if (waveSurferRef.current) {
-      try {
-        waveSurferRef.current.destroy();
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("WaveSurfer destroy error:", err);
-        } else {
-          console.info("AbortError during cleanup - ignoring");
+    // Cleanup on unmount
+    return () => {
+      if (waveRef.current) {
+        try {
+          waveRef.current?.destroy();
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            console.error("Destroy error:", err);
+          }
         }
+        waveRef.current = null;
       }
-      waveSurferRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    initWaveSurfer();
-    return () => cleanupWaveSurfer();
-  }, [initWaveSurfer, cleanupWaveSurfer]);
+    };
+  }, [audioUrl, onReady]);
 
   return (
-    <Box
+    <div
       ref={containerRef}
-      sx={{
+      style={{
         width: "100%",
         maxWidth: 800,
         backgroundColor: "#eee",
@@ -117,7 +72,10 @@ export default function WaveformEditor({
 }
 
 WaveformEditor.propTypes = {
-  sections: PropTypes.array.isRequired,
   audioUrl: PropTypes.string.isRequired,
-  onBarRegionUpdate: PropTypes.func.isRequired,
+  onReady: PropTypes.func,
+};
+
+WaveformEditor.defaultProps = {
+  onReady: null,
 };

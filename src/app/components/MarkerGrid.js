@@ -11,12 +11,6 @@ import {
   Divider,
 } from "@mui/material";
 
-/**
- * Updated:
- *  - Each row now shows 8 bars in one row.
- *  - Smaller MUI buttons with label = just the bar number.
- *  - Removed vertical dashed line/separator.
- */
 export default function MarkerGrid({ sections, onPlayBar }) {
   const [activeMarkerId, setActiveMarkerId] = useState(null);
   const [elapsed, setElapsed] = useState(0);
