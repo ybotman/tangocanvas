@@ -8,7 +8,7 @@ import {
   Grid,
   LinearProgress,
   Typography,
-  Divider
+  Divider,
 } from "@mui/material";
 
 /**
@@ -134,10 +134,10 @@ MarkerGrid.propTypes = {
           id: PropTypes.string.isRequired,
           label: PropTypes.string.isRequired,
           start: PropTypes.number.isRequired,
-          end: PropTypes.number.isRequired
-        })
-      ).isRequired
-    })
+          end: PropTypes.number.isRequired,
+        }),
+      ).isRequired,
+    }),
   ).isRequired,
-  onPlayBar: PropTypes.func.isRequired
+  onPlayBar: PropTypes.func.isRequired,
 };

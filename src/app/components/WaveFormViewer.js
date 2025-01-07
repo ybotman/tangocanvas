@@ -22,7 +22,7 @@ export default function WaveformViewer({ onInit }) {
         width: "100%",
         maxWidth: 800,
         height: 100,
-        backgroundColor: "#eee"
+        backgroundColor: "#eee",
       }}
       ref={waveformRef}
     />
@@ -30,5 +30,5 @@ export default function WaveformViewer({ onInit }) {
 }
 
 WaveformViewer.propTypes = {
-  onInit: PropTypes.func.isRequired
+  onInit: PropTypes.func.isRequired,
 };

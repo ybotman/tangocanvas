@@ -20,10 +20,13 @@ export default function useWaveSurfer({ containerRef }) {
       container: containerRef.current,
       waveColor: "#999",
       progressColor: "#f50057",
-      barWidth: 2,
+      pixelRatio: 2,
+      barWidth: 0, // or remove barWidth to let WaveSurfer draw a continuous wave
+      minPxPerSec: 50, // or higher
+      scrollParent: true, // if you have enough horizontal space
       height: 100,
       responsive: true,
-      backend: "WebAudio"
+      backend: "WebAudio",
     });
 
     waveSurferRef.current.on("ready", () => setIsReady(true));
@@ -69,7 +72,7 @@ export default function useWaveSurfer({ containerRef }) {
         }
       }, snippetDuration * 1000);
     },
-    [isReady]
+    [isReady],
   );
 
   // 4) Zoom to highlight bar in context
@@ -78,19 +81,19 @@ export default function useWaveSurfer({ containerRef }) {
       if (!waveSurferRef.current || !isReady) return;
 
       // each bar ~3s => 3 bars => ~9s wide
-      const widthSec = barsToShow * 3; 
-      const PPS = 30; 
+      const widthSec = barsToShow * 3;
+      const PPS = 30;
       waveSurferRef.current.zoom(PPS);
 
       // Center startSec in the 9s window
-      const halfSpan = widthSec / 2; 
+      const halfSpan = widthSec / 2;
       let centerTime = startSec + halfSpan;
       if (centerTime > totalDuration) centerTime = totalDuration;
 
       const ratio = centerTime / totalDuration;
       waveSurferRef.current.seekTo(Math.min(ratio, 1));
     },
-    [isReady]
+    [isReady],
   );
 
   // 5) Cleanup
@@ -112,10 +115,10 @@ export default function useWaveSurfer({ containerRef }) {
     playSnippet,
     zoomToBar,
     cleanupWaveSurfer,
-    isReady
+    isReady,
   };
 }
 
 useWaveSurfer.propTypes = {
-  containerRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+  containerRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
 };

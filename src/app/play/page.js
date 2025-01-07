@@ -17,7 +17,7 @@ export default function PlayPage() {
     playSnippet,
     zoomToBar,
     cleanupWaveSurfer,
-    isReady
+    isReady,
   } = useWaveSurfer({ containerRef });
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function PlayPage() {
       // 2) Zoom in to see ~3 bars around it
       zoomToBar(start, songData.duration, 3);
     },
-    [isReady, songData, playSnippet, zoomToBar]
+    [isReady, songData, playSnippet, zoomToBar],
   );
 
   if (loading) {
