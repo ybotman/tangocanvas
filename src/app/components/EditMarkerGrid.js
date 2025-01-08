@@ -1,9 +1,9 @@
-// src/app/edit/components/EditMarkerGrid.js
 "use client";
 
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Typography, Button, Grid, Divider } from "@mui/material";
+import { Box, Button, Grid, Typography, Divider } from "@mui/material";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 export default function EditMarkerGrid({
   sections,
@@ -11,12 +11,9 @@ export default function EditMarkerGrid({
   onPlayBar,
 }) {
   /**
-   * handleShift => called when user clicks ±0.1
-   *   - if bar is "bar-1" => do nothing (cannot shift)
-   *   - else => call onAdjustBarTime(bar.id, delta)
+   * Shift the bar’s start time by ±0.1s, except if bar is "bar-1".
    */
   const handleShift = (bar, delta) => {
-    // If this is bar-1 (i.e. the first bar in the entire track), do nothing
     if (bar.id === "bar-1") {
       console.info("Bar 1 cannot shift. Ignoring request.");
       return;
@@ -25,8 +22,7 @@ export default function EditMarkerGrid({
   };
 
   /**
-   * handlePlay => bar label is now a button to snippet-play from bar.start..bar.end
-   *   - or up to nextBar.start if you prefer that approach
+   * Play from bar.start..bar.end, or up to the next bar’s start if desired.
    */
   const handlePlay = (bar, nextBar) => {
     if (nextBar) {
@@ -39,7 +35,7 @@ export default function EditMarkerGrid({
   return (
     <Box sx={{ mt: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Edit Markers (Manual)
+        Edit Markers (Compact)
       </Typography>
 
       {sections.map((section) => (
@@ -52,7 +48,6 @@ export default function EditMarkerGrid({
           <Grid container spacing={1}>
             {section.markers.map((bar, idx) => {
               const nextBar = section.markers[idx + 1] || null;
-              const isBar1 = bar.id === "bar-1";
 
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={bar.id}>
@@ -66,46 +61,64 @@ export default function EditMarkerGrid({
                       gap: 0.5,
                     }}
                   >
-                    {/* Instead of plain text, we make the bar label a button for playback */}
-                    <Button
-                      variant="text"
-                      size="small"
-                      onClick={() => handlePlay(bar, nextBar)}
-                      sx={{ 
-                        textTransform: "none", 
-                        fontWeight: "bold", 
-                        justifyContent: "flex-start" 
+                    {/* Top row: Bar label + shift buttons */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                       }}
                     >
-                      {bar.label}
-                    </Button>
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={() => handlePlay(bar, nextBar)}
+                        sx={{ textTransform: "none", fontWeight: "bold" }}
+                      >
+                        {bar.label}
+                      </Button>
 
-                    <Typography variant="body2">
-                      Start: {bar.start.toFixed(2)}s
-                    </Typography>
-                    <Typography variant="body2">
-                      End: {bar.end.toFixed(2)}s
-                    </Typography>
-
-                    {/* SHIFT Buttons (hidden if bar-1) */}
-                    {!isBar1 && (
-                      <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+                      <Box sx={{ display: "flex", gap: 0.5 }}>
                         <Button
-                          variant="outlined"
+                          variant="text"
                           size="small"
                           onClick={() => handleShift(bar, -0.1)}
                         >
                           -0.1s
                         </Button>
                         <Button
-                          variant="outlined"
+                          variant="text"
                           size="small"
                           onClick={() => handleShift(bar, 0.1)}
                         >
                           +0.1s
                         </Button>
                       </Box>
-                    )}
+                    </Box>
+
+                    {/* Second row: Range start → end */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                      >
+                        {bar.start.toFixed(2)}s
+                      </Typography>
+                      <KeyboardArrowRightIcon fontSize="small" />
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                      >
+                        {bar.end.toFixed(2)}s
+                      </Typography>
+                    </Box>
                   </Box>
                 </Grid>
               );
@@ -118,7 +131,21 @@ export default function EditMarkerGrid({
 }
 
 EditMarkerGrid.propTypes = {
-  sections: PropTypes.array.isRequired,
+  sections: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      markers: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          label: PropTypes.string.isRequired,
+          start: PropTypes.number.isRequired,
+          end: PropTypes.number.isRequired,
+        })
+      ).isRequired,
+    })
+  ).isRequired,
   onAdjustBarTime: PropTypes.func.isRequired,
   onPlayBar: PropTypes.func.isRequired,
 };
