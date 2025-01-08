@@ -40,8 +40,12 @@ export default function EditPage() {
   }, []);
 
   // Our marker editing hook
-  const { sections, finalizeAndGetJSON, applyNewBarLengthAfterBar,adjustBarTime } =
-    useMarkerEditor(songData || {});
+  const {
+    sections,
+    finalizeAndGetJSON,
+    applyNewBarLengthAfterBar,
+    adjustBarTime,
+  } = useMarkerEditor(songData || {});
 
   // Snippet playback (play bar from start..end)
   const handlePlayBar = useCallback((start, end) => {
@@ -155,7 +159,8 @@ export default function EditPage() {
         <EditMarkerGrid
           sections={sections}
           onAdjustBarTime={adjustBarTime}
-          onPlayBar={handlePlayBar} />
+          onPlayBar={handlePlayBar}
+        />
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export async function GET() {
     // Filter for audio extensions
     const audioExtensions = [".mp3", ".wav", ".flac", ".aac", ".ogg"];
     const audioFiles = files.filter((file) =>
-      audioExtensions.includes(path.extname(file).toLowerCase())
+      audioExtensions.includes(path.extname(file).toLowerCase()),
     );
 
     // Return as JSON
@@ -23,7 +23,7 @@ export async function GET() {
     console.error("Error reading songs folder:", err);
     return NextResponse.json(
       { error: "Failed to list songs." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -40,7 +40,7 @@ export async function POST(request) {
     if (!filename || !base64Data) {
       return NextResponse.json(
         { error: "filename and base64Data are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -53,7 +53,7 @@ export async function POST(request) {
       // If we get here, file is found
       return NextResponse.json(
         { error: "File already exists. Use a different filename." },
-        { status: 409 }
+        { status: 409 },
       );
     } catch {
       // File not found, so we can proceed
@@ -82,7 +82,7 @@ export async function DELETE(request) {
     if (!filename) {
       return NextResponse.json(
         { error: "Missing 'filename' query param" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -96,7 +96,7 @@ export async function DELETE(request) {
       // If not found, respond 404
       return NextResponse.json(
         { error: `Song ${filename} not found.` },
-        { status: 404 }
+        { status: 404 },
       );
     }
 

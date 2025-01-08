@@ -133,7 +133,7 @@ export default function useMarkerEditor(songData) {
       return newSecs;
     });
   }, []);
-  
+
   /**
    * finalizeAndGetJSON => merges local sections back into the original
    */
@@ -148,6 +148,6 @@ export default function useMarkerEditor(songData) {
     sections,
     applyNewBarLengthAfterBar,
     finalizeAndGetJSON,
-    adjustBarTime
+    adjustBarTime,
   };
 }

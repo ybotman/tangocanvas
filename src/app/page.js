@@ -1,10 +1,6 @@
-//--------------------------------------------------------------
-//src/app/page.js
-//--------------------------------------------------------------
-
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -23,13 +19,11 @@ import styles from "./styles/Page.module.css";
 export default function Page() {
   const router = useRouter();
 
-  // Pull song data and loading/error states from context
-  const { songs, loading, error } = useSongContext();
+  // Pull data from context
+  const { songs, loading, error, selectedSong, setSelectedSong } =
+    useSongContext();
 
-  // Local state for the currently selected song
-  const [selectedSong, setSelectedSong] = useState(null);
-
-  // Snackbar state for the "Generate" and "Copy-Latest" placeholder actions
+  // Snackbar for the "Generate" and "Copy-Latest" placeholder actions
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -37,28 +31,14 @@ export default function Page() {
   });
 
   /**
-   * Load the last selected song from localStorage, if any,
-   * once we have the 'songs' array.
+   * Dismiss the Snackbar.
    */
-  useEffect(() => {
-    const lastSong = localStorage.getItem("lastSelectedSong");
-    if (lastSong && songs.length > 0) {
-      const found = songs.find((s) => s.filename === lastSong);
-      if (found) setSelectedSong(found);
-    }
-  }, [songs]);
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   /**
-   * Whenever 'selectedSong' changes, store it in localStorage.
-   */
-  useEffect(() => {
-    if (selectedSong) {
-      localStorage.setItem("lastSelectedSong", selectedSong.filename);
-    }
-  }, [selectedSong]);
-
-  /**
-   * Show a warning Snackbar for "Generate" — placeholder.
+   * "Generate" placeholder
    */
   const handleGenerate = () => {
     setSnackbar({
@@ -69,7 +49,7 @@ export default function Page() {
   };
 
   /**
-   * Show a warning Snackbar for "Copy-Latest" — placeholder.
+   * "Copy-Latest" placeholder
    */
   const handleCopyLatest = () => {
     setSnackbar({
@@ -80,17 +60,10 @@ export default function Page() {
   };
 
   /**
-   * Dismiss the Snackbar.
-   */
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
-
-  /**
    * Navigate to the requested page if we have a valid selectedSong.
    */
   const handleNavigation = (target) => {
-    if (!selectedSong) return;
+    if (!selectedSong) return; // guard
 
     switch (target) {
       case "play":
@@ -107,9 +80,11 @@ export default function Page() {
     }
   };
 
-  /**
-   * 1) If we're still loading, show a loading message.
-   */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER: Handle loading, errors, or empty song list first.
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // 1) Loading
   if (loading) {
     return (
       <Box>
@@ -119,9 +94,7 @@ export default function Page() {
     );
   }
 
-  /**
-   * 2) If there's an error, show it.
-   */
+  // 2) Error
   if (error) {
     return (
       <Box>
@@ -133,32 +106,44 @@ export default function Page() {
     );
   }
 
-  /**
-   * 3) If no songs at all, show a fallback message.
-   */
+  // 3) No songs
   if (songs.length === 0) {
     return (
       <Box>
         <Header />
         <Typography sx={{ p: 3 }}>
-          No songs found. Please check your <code>public/songs</code> folder and{' '}
+          No songs found. Please check your <code>public/songs</code> folder and{" "}
           <code>approvedSongs.json</code>.
         </Typography>
       </Box>
     );
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MAIN UI
+  // ─────────────────────────────────────────────────────────────────────────────
+
   return (
     <Box className={styles.container}>
       <Header />
 
-      {/* SONG SELECTION */}
+      {/* TOP LABEL: Current Song */}
+      <Box sx={{ mb: 2, mt: 2 }}>
+        <Typography variant="h5">
+          Current Song:{" "}
+          <strong>{selectedSong ? selectedSong.filename : "None"}</strong>
+        </Typography>
+      </Box>
+
+      {/* SONG SELECTION DROPDOWN */}
       <Box className={styles.searchSection}>
         <Autocomplete
           options={songs}
+          // We'll show "filename (state)" in the dropdown
           getOptionLabel={(option) => `${option.filename} (${option.state})`}
-          value={selectedSong}
-          onChange={(_, newValue) => setSelectedSong(newValue)}
+          // Force the dropdown to start unselected by referencing "selectedSong" in context
+          value={selectedSong || null}
+          onChange={(_, newValue) => setSelectedSong(newValue || null)}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -183,7 +168,10 @@ export default function Page() {
         <Box className={styles.buttonGroup}>
           {/* Approved => Play */}
           {selectedSong.state === "Approved" && (
-            <Button variant="contained" onClick={() => handleNavigation("play")}>
+            <Button
+              variant="contained"
+              onClick={() => handleNavigation("play")}
+            >
               Play
             </Button>
           )}
@@ -195,7 +183,7 @@ export default function Page() {
                 variant="contained"
                 onClick={() => handleNavigation("verify")}
               >
-                Verify-Play
+                Verify
               </Button>
               <Button
                 variant="outlined"
@@ -223,7 +211,10 @@ export default function Page() {
               >
                 Generate
               </Button>
-              <Button variant="outlined" onClick={() => handleNavigation("edit")}>
+              <Button
+                variant="outlined"
+                onClick={() => handleNavigation("edit")}
+              >
                 Edit
               </Button>
             </>
@@ -238,7 +229,7 @@ export default function Page() {
         </Box>
       )}
 
-      {/* SNACKBAR */}
+      {/* SNACKBAR for placeholders */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -257,7 +248,6 @@ export default function Page() {
   );
 }
 
-// OPTIONAL: Define PropTypes for clarity and ESLint compliance
 Page.propTypes = {
-  // no external props currently needed
+  // no external props currently
 };

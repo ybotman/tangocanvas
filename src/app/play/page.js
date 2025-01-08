@@ -32,7 +32,9 @@ export default function PlayPage() {
    */
   useEffect(() => {
     if (!selectedSong) {
-      setSongError("No song selected. Please return to the main page and select a song.");
+      setSongError(
+        "No song selected. Please return to the main page and select a song.",
+      );
       setSongLoading(false);
     }
   }, [selectedSong]);
@@ -56,7 +58,9 @@ export default function PlayPage() {
         // Fetch marker JSON
         const resp = await fetch(markerUrl);
         if (!resp.ok) {
-          throw new Error(`Failed to load marker JSON at ${markerUrl} (${resp.status})`);
+          throw new Error(
+            `Failed to load marker JSON at ${markerUrl} (${resp.status})`,
+          );
         }
         const data = await resp.json();
 
@@ -103,7 +107,7 @@ export default function PlayPage() {
       // If your markerData includes full `duration`, you can pass it here
       zoomToBar(start, markerData.duration || 180, 3);
     },
-    [isReady, markerData, playSnippet, zoomToBar]
+    [isReady, markerData, playSnippet, zoomToBar],
   );
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -129,7 +133,7 @@ export default function PlayPage() {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
-          Marker data not found or empty.  
+          Marker data not found or empty.
         </Typography>
       </Box>
     );

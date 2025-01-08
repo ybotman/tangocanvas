@@ -16,7 +16,10 @@ export async function POST(request) {
     const { songId, ...rest } = body;
 
     if (!songId) {
-      return NextResponse.json({ error: "songId is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "songId is required" },
+        { status: 400 },
+      );
     }
 
     // Path to the 'public/markers' folder
@@ -29,7 +32,7 @@ export async function POST(request) {
       // If we get here, the file exists -> error
       return NextResponse.json(
         { error: "Markers file already exists. Use PUT to update instead." },
-        { status: 409 }
+        { status: 409 },
       );
     } catch {
       // File does NOT exist, so we can create it
@@ -39,10 +42,13 @@ export async function POST(request) {
     await fs.writeFile(
       newFilePath,
       JSON.stringify({ songId, ...rest }, null, 2),
-      "utf-8"
+      "utf-8",
     );
 
-    return NextResponse.json({ success: true, message: "Markers file created." });
+    return NextResponse.json({
+      success: true,
+      message: "Markers file created.",
+    });
   } catch (err) {
     console.error("Error in POST /api/markers:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -61,7 +67,10 @@ export async function PUT(request) {
     const { songId, ...rest } = body;
 
     if (!songId) {
-      return NextResponse.json({ error: "songId is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "songId is required" },
+        { status: 400 },
+      );
     }
 
     // Path to the 'public/markers' folder
@@ -103,7 +112,7 @@ export async function PUT(request) {
       // an error or just let user "create" with PUT. Let's choose:
       return NextResponse.json(
         { error: "No existing markers file. Use POST to create first." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -111,7 +120,7 @@ export async function PUT(request) {
     await fs.writeFile(
       mainFilePath,
       JSON.stringify({ songId, ...rest }, null, 2),
-      "utf-8"
+      "utf-8",
     );
 
     return NextResponse.json({

@@ -32,7 +32,9 @@ export function SongProvider({ children }) {
         // 1) Load approved filenames
         const approvedResp = await fetch("/songs/approvedSongs.json");
         if (!approvedResp.ok) {
-          throw new Error(`Failed to load approvedSongs.json: ${approvedResp.status}`);
+          throw new Error(
+            `Failed to load approvedSongs.json: ${approvedResp.status}`,
+          );
         }
         const approvedData = await approvedResp.json();
         const approvedFilenames = approvedData.songs.map((s) => s.filename);
@@ -54,7 +56,9 @@ export function SongProvider({ children }) {
             // Check for marker file
             const baseName = filename.replace(/\.\w+$/, "");
             try {
-              const markerResp = await fetch(`/markers/${baseName}-markers.json`);
+              const markerResp = await fetch(
+                `/markers/${baseName}-markers.json`,
+              );
               if (markerResp.ok) {
                 return { filename, state: "Matched" };
               }
@@ -65,7 +69,7 @@ export function SongProvider({ children }) {
             } catch {
               return { filename, state: "Unmatched" };
             }
-          })
+          }),
         );
 
         setSongs(processedSongs);
@@ -94,6 +98,20 @@ export function SongProvider({ children }) {
     selectedSong,
     setSelectedSong,
   };
+
+  useEffect(() => {
+    if (!loading && selectedSong?.state === "Loading") {
+      // We only do this once loading is done AND user is in "Loading" state
+      const found = songs.find((s) => s.filename === selectedSong.filename);
+      if (found) {
+        // Found the real state among processed songs
+        setSelectedSong(found);
+      } else {
+        // The lastChosen isn't valid anymore
+        setSelectedSong(null);
+      }
+    }
+  }, [loading, selectedSong, songs, setSelectedSong]);
 
   return <SongContext.Provider value={value}>{children}</SongContext.Provider>;
 }

@@ -7,7 +7,7 @@ import { promises as fs } from "fs";
 /**
  * POST /api/approveSong
  * Body: { filename: "someSong.mp3" }
- * 
+ *
  *  - Reads /public/songs/approvedSongs.json
  *  - Checks if filename is already present
  *  - If not, pushes it to the array
@@ -17,10 +17,18 @@ export async function POST(request) {
   try {
     const { filename } = await request.json();
     if (!filename) {
-      return NextResponse.json({ error: "No filename provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No filename provided" },
+        { status: 400 },
+      );
     }
 
-    const approvedPath = path.join(process.cwd(), "public", "songs", "approvedSongs.json");
+    const approvedPath = path.join(
+      process.cwd(),
+      "public",
+      "songs",
+      "approvedSongs.json",
+    );
     const raw = await fs.readFile(approvedPath, "utf-8");
     const approvedData = JSON.parse(raw);
 
@@ -30,7 +38,9 @@ export async function POST(request) {
     }
 
     // Check if it's already approved
-    const alreadyApproved = approvedData.songs.some((s) => s.filename === filename);
+    const alreadyApproved = approvedData.songs.some(
+      (s) => s.filename === filename,
+    );
     if (alreadyApproved) {
       return NextResponse.json({
         message: `Song "${filename}" is already approved.`,
@@ -39,7 +49,11 @@ export async function POST(request) {
 
     // Otherwise, add it
     approvedData.songs.push({ filename });
-    await fs.writeFile(approvedPath, JSON.stringify(approvedData, null, 2), "utf-8");
+    await fs.writeFile(
+      approvedPath,
+      JSON.stringify(approvedData, null, 2),
+      "utf-8",
+    );
 
     return NextResponse.json({
       success: true,

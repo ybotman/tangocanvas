@@ -104,7 +104,9 @@ export default function EditMarkerGrid({
                     </Box>
 
                     {/* ROW 2: start → end (duration) */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
                       <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                         {bar.start.toFixed(2)}s
                       </Typography>
@@ -142,9 +144,9 @@ EditMarkerGrid.propTypes = {
           label: PropTypes.string.isRequired,
           start: PropTypes.number.isRequired,
           end: PropTypes.number.isRequired,
-        })
+        }),
       ).isRequired,
-    })
+    }),
   ).isRequired,
   onAdjustBarTime: PropTypes.func.isRequired,
   onPlayBar: PropTypes.func.isRequired,

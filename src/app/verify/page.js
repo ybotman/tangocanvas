@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -9,9 +8,8 @@ import WaveformViewer from "@/components/WaveFormViewer";
 import MarkerGrid from "@/components/MarkerGrid";
 
 export default function VerifyPage() {
-  const { selectedSong } = useSongContext();
+  const { songs, selectedSong, setSelectedSong } = useSongContext();
 
-  // Local states
   const [markerData, setMarkerData] = useState(null);
   const [songLoading, setSongLoading] = useState(true);
   const [songError, setSongError] = useState("");
@@ -35,21 +33,32 @@ export default function VerifyPage() {
   } = useWaveSurfer({ containerRef });
 
   /**
-   * 1) If no selectedSong => show error or instruct user to go back.
+   * 1) If no selectedSong => try localStorage
    */
   useEffect(() => {
     if (!selectedSong) {
-      setSongError("No song selected. Please return to the main page and select a song.");
+      const lastSong = localStorage.getItem("lastSelectedSong");
+      if (lastSong && songs.length > 0) {
+        // see if it's in our songs list
+        const found = songs.find((s) => s.filename === lastSong);
+        if (found) {
+          setSelectedSong(found);
+          return;
+        }
+      }
+      // If we can’t find it
+      setSongError(
+        "No song selected. Please return to the main page and select a song.",
+      );
       setSongLoading(false);
     }
-  }, [selectedSong]);
+  }, [selectedSong, songs, setSelectedSong]);
 
   /**
-   * 2) Fetch marker data
+   * 2) Once we have a valid selectedSong, fetch marker data
    */
   useEffect(() => {
     if (!selectedSong) return;
-
     async function loadMarkerData() {
       setSongLoading(true);
       setSongError("");
@@ -63,7 +72,9 @@ export default function VerifyPage() {
         // Fetch marker JSON
         const resp = await fetch(markerUrl);
         if (!resp.ok) {
-          throw new Error(`Failed to load marker JSON at ${markerUrl} (${resp.status})`);
+          throw new Error(
+            `Failed to load marker JSON at ${markerUrl} (${resp.status})`,
+          );
         }
         const data = await resp.json();
         data.audioUrl = audioUrl;
@@ -75,7 +86,6 @@ export default function VerifyPage() {
         setSongLoading(false);
       }
     }
-
     loadMarkerData();
   }, [selectedSong]);
 
@@ -84,7 +94,6 @@ export default function VerifyPage() {
    */
   useEffect(() => {
     if (songLoading || !markerData || songError) return;
-
     initWaveSurfer();
     loadSong(markerData.audioUrl);
 
@@ -93,7 +102,7 @@ export default function VerifyPage() {
   }, [songLoading, markerData, songError]);
 
   /**
-   * 4) snippet playback from a bar
+   * 4) snippet playback
    */
   const handlePlayBar = useCallback(
     (bar) => {
@@ -102,11 +111,11 @@ export default function VerifyPage() {
       playSnippet(start, 4.5);
       zoomToBar(start, markerData.duration || 180, 3);
     },
-    [isReady, markerData, playSnippet, zoomToBar]
+    [isReady, markerData, playSnippet, zoomToBar],
   );
 
   /**
-   * 5) Approve => calls /api/approveSong to add to approvedSongs.json
+   * 5) Approve => /api/approveSong
    */
   const handleApprove = async () => {
     if (!selectedSong) return;
@@ -122,7 +131,6 @@ export default function VerifyPage() {
         throw new Error(result.error || "Failed to approve song");
       }
 
-      // If success or message
       setSnackbar({
         open: true,
         message: result.message || "Song approved!",
@@ -137,9 +145,10 @@ export default function VerifyPage() {
     }
   };
 
-  /**
-   * RENDER
-   */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────────
+
   if (songLoading) {
     return <Typography sx={{ p: 3 }}>Loading markers...</Typography>;
   }
@@ -170,7 +179,6 @@ export default function VerifyPage() {
         Verify Page – {markerData.songId || selectedSong.filename}
       </Typography>
 
-      {/* Approve Button */}
       <Button
         variant="contained"
         color="success"
@@ -180,20 +188,17 @@ export default function VerifyPage() {
         Approve This Song
       </Button>
 
-      {/* Waveform Container */}
       <WaveformViewer
         onInit={(ref) => {
           containerRef.current = ref.current;
         }}
       />
 
-      {/* Marker Grid */}
       <MarkerGrid
         sections={markerData.sections || []}
         onPlayBar={handlePlayBar}
       />
 
-      {/* Snackbar for Approve Feedback */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
