@@ -2,8 +2,10 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Button, Grid, Typography, Divider } from "@mui/material";
+import { Box, Grid, Typography, Divider, IconButton } from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 export default function EditMarkerGrid({
   sections,
@@ -48,6 +50,7 @@ export default function EditMarkerGrid({
           <Grid container spacing={1}>
             {section.markers.map((bar, idx) => {
               const nextBar = section.markers[idx + 1] || null;
+              const duration = (bar.end - bar.start).toFixed(2);
 
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={bar.id}>
@@ -55,68 +58,65 @@ export default function EditMarkerGrid({
                     sx={{
                       border: "1px solid #ccc",
                       borderRadius: 1,
-                      p: 1,
+                      p: 0.5,
                       display: "flex",
                       flexDirection: "column",
                       gap: 0.5,
                     }}
                   >
-                    {/* Top row: Bar label + shift buttons */}
+                    {/* ROW 1: Bar label (click) and Shift icons (right) */}
                     <Box
                       sx={{
                         display: "flex",
+                        alignItems: "center",
                         justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Button
-                        variant="text"
-                        size="small"
-                        onClick={() => handlePlay(bar, nextBar)}
-                        sx={{ textTransform: "none", fontWeight: "bold" }}
-                      >
-                        {bar.label}
-                      </Button>
-
-                      <Box sx={{ display: "flex", gap: 0.5 }}>
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => handleShift(bar, -0.1)}
-                        >
-                          -0.1s
-                        </Button>
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => handleShift(bar, 0.1)}
-                        >
-                          +0.1s
-                        </Button>
-                      </Box>
-                    </Box>
-
-                    {/* Second row: Range start → end */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.5,
-                        justifyContent: "center",
                       }}
                     >
                       <Typography
                         variant="body2"
-                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                        sx={{
+                          fontWeight: "bold",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          mr: 1,
+                        }}
+                        onClick={() => handlePlay(bar, nextBar)}
                       >
+                        {bar.label}
+                      </Typography>
+
+                      {bar.id !== "bar-1" && (
+                        <Box sx={{ display: "flex", gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleShift(bar, -0.1)}
+                          >
+                            <RemoveCircleOutlineIcon fontSize="inherit" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleShift(bar, 0.1)}
+                          >
+                            <AddCircleOutlineIcon fontSize="inherit" />
+                          </IconButton>
+                        </Box>
+                      )}
+                    </Box>
+
+                    {/* ROW 2: start → end (duration) */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                         {bar.start.toFixed(2)}s
                       </Typography>
                       <KeyboardArrowRightIcon fontSize="small" />
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {bar.end.toFixed(2)}s
+                      </Typography>
                       <Typography
                         variant="body2"
-                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                        sx={{ ml: 1, color: "green", fontWeight: "bold" }}
                       >
-                        {bar.end.toFixed(2)}s
+                        ({duration}s)
                       </Typography>
                     </Box>
                   </Box>
