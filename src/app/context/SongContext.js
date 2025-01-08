@@ -26,63 +26,116 @@ export function SongProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => {
-    async function fetchSongsData() {
-      try {
-        // 1) Load approved filenames
-        const approvedResp = await fetch("/songs/approvedSongs.json");
-        if (!approvedResp.ok) {
-          throw new Error(
-            `Failed to load approvedSongs.json: ${approvedResp.status}`,
-          );
-        }
-        const approvedData = await approvedResp.json();
-        const approvedFilenames = approvedData.songs.map((s) => s.filename);
+useEffect(() => {
+  async function fetchSongsData() {
+    try {
+      // 1) Load approved filenames
+      const approvedResp = await fetch("/songs/approvedSongs.json");
+      if (!approvedResp.ok) {
+        throw new Error(
+          `Failed to load approvedSongs.json: ${approvedResp.status}`
+        );
+      }
+      const approvedData = await approvedResp.json();
+      const approvedFilenames = approvedData.songs.map((s) => s.filename);
 
-        // 2) Load all audio files from /api/songs
-        const allResp = await fetch("/api/songs");
-        if (!allResp.ok) {
-          throw new Error(`Failed to load audio files: ${allResp.status}`);
-        }
-        const allData = await allResp.json();
+      // 2) Load all audio files from /api/songs
+      const allResp = await fetch("/api/songs");
+      if (!allResp.ok) {
+        throw new Error(`Failed to load audio files: ${allResp.status}`);
+      }
+      const allData = await allResp.json();
 
-        // 3) Derive each song's state
-        const processedSongs = await Promise.all(
-          allData.songs.map(async (song) => {
-            const { filename } = song;
-            if (approvedFilenames.includes(filename)) {
-              return { filename, state: "Approved" };
+      // 3) Derive each song's state
+      const processedSongs = await Promise.all(
+        allData.songs.map(async (song) => {
+          const { filename } = song;
+
+          // If it's in approvedSongs.json => Approved
+          if (approvedFilenames.includes(filename)) {
+            return { filename, state: "Approved" };
+          }
+
+          // Otherwise check for marker file (HEAD)
+          const baseName = filename.replace(/\.\w+$/, "");
+          try {
+            const headResp = await fetch(
+              `/markers/${baseName}-markers.json`,
+              { method: "HEAD" }
+            );
+            if (headResp.ok) {
+              // Good => we can consider it "Matched"
+              return { filename, state: "Matched" };
             }
-            // Check for marker file
-            const baseName = filename.replace(/\.\w+$/, "");
-            try {
-              const markerResp = await fetch(
-                `/markers/${baseName}-markers.json`,
-              );
-              if (markerResp.ok) {
+
+            if (headResp.status === 404) {
+              // 404 => Create a minimal marker file so we won't see 404 again
+              const created = await createEmptyMarkerFile(baseName);
+              if (created) {
+                // If creation succeeded => consider it "Matched"
                 return { filename, state: "Matched" };
-              }
-              if (markerResp.status === 404) {
+              } else {
+                // If creation failed => fallback
                 return { filename, state: "NoJson" };
               }
-              return { filename, state: "Unmatched" };
-            } catch {
-              return { filename, state: "Unmatched" };
             }
-          }),
-        );
 
-        setSongs(processedSongs);
-      } catch (err) {
-        console.error("SongContext Error:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+            // If it's not 200 or 404 => some 5xx or 403 => "Unmatched"
+            return { filename, state: "Unmatched" };
+          } catch {
+            // network or other error => "Unmatched"
+            return { filename, state: "Unmatched" };
+          }
+        })
+      );
+
+      setSongs(processedSongs);
+    } catch (err) {
+      console.error("SongContext Error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchSongsData();
-  }, []);
+  fetchSongsData();
+}, []);
+
+/**
+ * Helper: Creates a minimal <songId>-markers.json
+ * by POST /api/markers with:
+ * {
+ *   "songId": baseName,
+ *   "title": baseName,
+ *   "duration": 0,
+ *   "sections": []
+ * }
+ */
+async function createEmptyMarkerFile(songId) {
+  const defaultJson = {
+    songId,
+    title: songId,
+    duration: 0,
+    sections: [],
+  };
+
+  try {
+    const resp = await fetch("/api/markers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(defaultJson),
+    });
+    if (!resp.ok) {
+      const result = await resp.json().catch(() => ({}));
+      console.warn("Failed to create empty marker file:", result.error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("Error creating marker file:", err);
+    return false;
+  }
+}
 
   // Keep localStorage in sync with selectedSong
   useEffect(() => {

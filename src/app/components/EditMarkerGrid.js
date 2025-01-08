@@ -36,10 +36,6 @@ export default function EditMarkerGrid({
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Edit Markers (Compact)
-      </Typography>
-
       {sections.map((section) => (
         <Box key={section.id} sx={{ mb: 3 }}>
           <Divider sx={{ my: 1 }} />

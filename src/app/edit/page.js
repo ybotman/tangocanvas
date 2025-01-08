@@ -226,17 +226,11 @@ export default function EditPage() {
           <Button variant="contained" onClick={handleApplyBarLen}>
             Apply
           </Button>
-        </Box>
-
-        {/* Save Buttons */}
-        <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-          <Button variant="contained" onClick={handleSave}>
+                    <Button variant="contained" onClick={handleSave}>
             Save Markers
           </Button>
-          <Button variant="outlined" onClick={handleSaveOld}>
-            Export JSON
-          </Button>
         </Box>
+
       </div>
 
       {/* SCROLLABLE BARS for editing */}
