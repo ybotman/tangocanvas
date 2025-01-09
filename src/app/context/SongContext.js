@@ -1,9 +1,20 @@
+/* --------------------------------------------
+ * src/app/context/SongContext.js
+ * --------------------------------------------
+ */
+
 "use client";
 
 import React, { createContext, useContext, useRef, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import WaveSurfer from "wavesurfer.js";
 
+/**
+ * SongContext:
+ *  - Manages a single WaveSurfer instance for the entire app
+ *  - Tracks songs, selectedSong, and isPlaying
+ *  - Provides snippet playback, capture of wave clicks, etc.
+ */
 const SongContext = createContext();
 
 export function SongProvider({ children }) {
@@ -13,15 +24,18 @@ export function SongProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // For capturing wave clicks / double clicks, used by pages like AutoGen
+  const [lastClickTime, setLastClickTime] = useState(0);
+
   const waveSurferRef = useRef(null);
 
   /**
-   * Initialize WaveSurfer (if not already initialized).
+   * 1) Create or re-use WaveSurfer instance in the container: "#waveform"
    */
   const initWaveSurfer = () => {
     if (!waveSurferRef.current) {
       waveSurferRef.current = WaveSurfer.create({
-        container: "#waveform", // Dynamically replace if necessary
+        container: "#waveform",
         waveColor: "#999",
         progressColor: "#f50057",
         cursorColor: "#333",
@@ -30,14 +44,23 @@ export function SongProvider({ children }) {
         backend: "WebAudio",
       });
 
+      // Playback state
       waveSurferRef.current.on("play", () => setIsPlaying(true));
       waveSurferRef.current.on("pause", () => setIsPlaying(false));
       waveSurferRef.current.on("finish", () => setIsPlaying(false));
+
+      // Optional: capture "seek" event to detect user clicks or scrubs
+      waveSurferRef.current.on("seek", (progress) => {
+        const duration = waveSurferRef.current.getDuration();
+        const clickedSec = duration * progress;
+        const secTenths = parseFloat(clickedSec.toFixed(1));
+        setLastClickTime(secTenths);
+      });
     }
   };
 
   /**
-   * Load a Song into WaveSurfer.
+   * 2) Load an audio file into WaveSurfer
    */
   const loadSong = (url) => {
     if (!waveSurferRef.current) initWaveSurfer();
@@ -45,21 +68,42 @@ export function SongProvider({ children }) {
   };
 
   /**
-   * Toggle Play/Pause.
+   * 3) Toggle Play/Pause
    */
   const togglePlay = () => {
-    waveSurferRef.current?.playPause();
+    if (!waveSurferRef.current) return;
+    waveSurferRef.current.playPause();
   };
 
   /**
-   * Stop Audio Playback.
+   * 4) Stop Playback
    */
   const stopAudio = () => {
-    waveSurferRef.current?.stop();
+    if (waveSurferRef.current) {
+      waveSurferRef.current.stop();
+    }
   };
 
   /**
-   * Cleanup WaveSurfer (e.g., when leaving a page).
+   * 5) snippetPlayback => play from startSec..(startSec + snippetLen)
+   */
+  const snippetPlayback = (startSec, snippetLen = 4.5) => {
+    if (!waveSurferRef.current) return;
+    const ws = waveSurferRef.current;
+    const totalDur = ws.getDuration();
+    if (!totalDur || startSec >= totalDur) return;
+
+    ws.stop(); // ensure a clean start
+    ws.seekTo(startSec / totalDur);
+    ws.play();
+
+    setTimeout(() => {
+      ws.stop();
+    }, snippetLen * 1000);
+  };
+
+  /**
+   * 6) Cleanup WaveSurfer
    */
   const cleanupWaveSurfer = () => {
     if (waveSurferRef.current) {
@@ -70,7 +114,7 @@ export function SongProvider({ children }) {
   };
 
   /**
-   * Fetch and Process Songs
+   * 7) Fetch & process the songs + marker logic
    */
   useEffect(() => {
     async function fetchSongsData() {
@@ -94,30 +138,24 @@ export function SongProvider({ children }) {
         const processedSongs = await Promise.all(
           allData.songs.map(async (song) => {
             const { filename } = song;
-
-            // If it's in approvedSongs.json => Approved
             if (approvedFilenames.includes(filename)) {
               return { filename, state: "Approved" };
             }
-
-            // Otherwise check for marker file (HEAD)
+            // Check marker file
             const baseName = filename.replace(/\.\w+$/, "");
             try {
-              const headResp = await fetch(`/markers/${baseName}-markers.json`, { method: "HEAD" });
+              const headResp = await fetch(`/markers/${baseName}-markers.json`, {
+                method: "HEAD",
+              });
               if (headResp.ok) {
                 return { filename, state: "Matched" };
               }
-
               if (headResp.status === 404) {
-                // 404 => Create a minimal marker file so we won't see 404 again
                 const created = await createEmptyMarkerFile(baseName);
-                if (created) {
-                  return { filename, state: "Matched" };
-                } else {
-                  return { filename, state: "NoJson" };
-                }
+                return created
+                  ? { filename, state: "Matched" }
+                  : { filename, state: "NoJson" };
               }
-
               return { filename, state: "Unmatched" };
             } catch {
               return { filename, state: "Unmatched" };
@@ -138,7 +176,7 @@ export function SongProvider({ children }) {
   }, []);
 
   /**
-   * Create a minimal <songId>-markers.json
+   * Create a minimal <songId>-markers.json if missing
    */
   async function createEmptyMarkerFile(songId) {
     const defaultJson = {
@@ -167,7 +205,7 @@ export function SongProvider({ children }) {
   }
 
   /**
-   * Sync localStorage with selectedSong
+   * 8) localStorage sync for selectedSong
    */
   useEffect(() => {
     if (selectedSong?.filename) {
@@ -176,7 +214,7 @@ export function SongProvider({ children }) {
   }, [selectedSong]);
 
   /**
-   * Restore last selected song after fetching songs
+   * 9) If we had a "Loading" state for a leftover selection, we fix it after loading
    */
   useEffect(() => {
     if (!loading && selectedSong?.state === "Loading") {
@@ -189,19 +227,21 @@ export function SongProvider({ children }) {
     }
   }, [loading, selectedSong, songs]);
 
+  // Provide everything
   const value = {
     songs,
     selectedSong,
     setSelectedSong,
     isPlaying,
-    waveSurfer: waveSurferRef.current,
-    initWaveSurfer,
     loadSong,
     togglePlay,
     stopAudio,
+    snippetPlayback,
     cleanupWaveSurfer,
-    loading,
+    lastClickTime, // for pages like AutoGen to read if needed
+    setLastClickTime,
     error,
+    loading,
   };
 
   return <SongContext.Provider value={value}>{children}</SongContext.Provider>;

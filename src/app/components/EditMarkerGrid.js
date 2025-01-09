@@ -1,13 +1,17 @@
+//------------------------------------------------------------------------------
+//src/app/components/EditMarkerGrid2.js
+//------------------------------------------------------------------------------
+
 "use client";
 
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Grid, Typography, Divider, IconButton } from "@mui/material";
+import { Box, Grid2, Typography, Divider, IconButton } from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-export default function EditMarkerGrid({
+export default function EditMarkerGrid2({
   sections,
   onAdjustBarTime,
   onPlayBar,
@@ -43,13 +47,13 @@ export default function EditMarkerGrid({
             {section.label} ({section.type})
           </Typography>
 
-          <Grid container spacing={1}>
+          <Grid2 container spacing={1}>
             {section.markers.map((bar, idx) => {
               const nextBar = section.markers[idx + 1] || null;
               const duration = (bar.end - bar.start).toFixed(2);
 
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={bar.id}>
+                <Grid2 item="true" xs={12} sm={6} md={4} lg={3} key={bar.id}>
                   <Box
                     sx={{
                       border: "1px solid #ccc",
@@ -118,17 +122,17 @@ export default function EditMarkerGrid({
                       </Typography>
                     </Box>
                   </Box>
-                </Grid>
+                </Grid2>
               );
             })}
-          </Grid>
+          </Grid2>
         </Box>
       ))}
     </Box>
   );
 }
 
-EditMarkerGrid.propTypes = {
+EditMarkerGrid2.propTypes = {
   sections: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

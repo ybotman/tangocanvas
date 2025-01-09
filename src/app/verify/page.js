@@ -1,14 +1,29 @@
+/* --------------------------------------------
+ * src/app/verify/page.js
+ * --------------------------------------------
+ */
+
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
 import { useSongContext } from "@/context/SongContext";
-import useWaveSurfer from "@/hooks/useWaveSurfer";
-import WaveformViewer from "@/components/WaveFormViewer";
 import MarkerGrid from "@/components/MarkerGrid";
 
+/**
+ * The Verify page uses SongContext's single wave, loaded into #waveform.
+ * We do not create a local wave. We simply call loadSong(...) from context.
+ */
 export default function VerifyPage() {
-  const { songs, selectedSong, setSelectedSong } = useSongContext();
+  const {
+    songs,
+    selectedSong,
+    setSelectedSong,
+    loadSong,
+    snippetPlayback,
+    cleanupWaveSurfer,
+    error: contextError,
+  } = useSongContext();
 
   const [markerData, setMarkerData] = useState(null);
   const [songLoading, setSongLoading] = useState(true);
@@ -21,35 +36,20 @@ export default function VerifyPage() {
     severity: "info",
   });
 
-  // WaveSurfer integration
-  const containerRef = useRef(null);
-  const {
-    initWaveSurfer,
-    loadSong,
-    playSnippet,
-    zoomToBar,
-    cleanupWaveSurfer,
-    isReady,
-  } = useWaveSurfer({ containerRef });
-
   /**
-   * 1) If no selectedSong => try localStorage
+   * 1) If no selectedSong => attempt to restore from localStorage, or error out
    */
   useEffect(() => {
     if (!selectedSong) {
       const lastSong = localStorage.getItem("lastSelectedSong");
       if (lastSong && songs.length > 0) {
-        // see if it's in our songs list
         const found = songs.find((s) => s.filename === lastSong);
         if (found) {
           setSelectedSong(found);
           return;
         }
       }
-      // If we can’t find it
-      setSongError(
-        "No song selected. Please return to the main page and select a song.",
-      );
+      setSongError("No song selected. Please return to the main page.");
       setSongLoading(false);
     }
   }, [selectedSong, songs, setSelectedSong]);
@@ -72,13 +72,10 @@ export default function VerifyPage() {
         // Fetch marker JSON
         const resp = await fetch(markerUrl);
         if (!resp.ok) {
-          throw new Error(
-            `Failed to load marker JSON at ${markerUrl} (${resp.status})`,
-          );
+          throw new Error(`Failed to load marker JSON at ${markerUrl} (${resp.status})`);
         }
         const data = await resp.json();
         data.audioUrl = audioUrl;
-
         setMarkerData(data);
       } catch (err) {
         setSongError(err.message || "Error fetching marker data.");
@@ -90,36 +87,33 @@ export default function VerifyPage() {
   }, [selectedSong]);
 
   /**
-   * 3) WaveSurfer init once markerData is loaded
+   * 3) Once markerData is loaded, wave is created in context referencing #waveform
+   *    => loadSong() with the audio URL. Then we can snippet-play from context.
    */
   useEffect(() => {
-    if (songLoading || !markerData || songError) return;
-    initWaveSurfer();
-    loadSong(markerData.audioUrl);
+    if (!songLoading && markerData && !songError) {
+      const audioUrl = `/songs/${selectedSong.filename}`;
+      loadSong(audioUrl);
+    }
 
-    return cleanupWaveSurfer;
+    // Cleanup wave on unmount
+    return () => cleanupWaveSurfer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [songLoading, markerData, songError]);
 
   /**
-   * 4) snippet playback
+   * 4) snippet playback from a bar
    */
-  const handlePlayBar = useCallback(
-    (bar) => {
-      if (!isReady || !markerData) return;
-      const { start } = bar;
-      playSnippet(start, 4.5);
-      zoomToBar(start, markerData.duration || 180, 3);
-    },
-    [isReady, markerData, playSnippet, zoomToBar],
-  );
+  const handlePlayBar = (bar) => {
+    if (!markerData) return;
+    snippetPlayback(bar.start, 4.5);
+  };
 
   /**
    * 5) Approve => /api/approveSong
    */
   const handleApprove = async () => {
     if (!selectedSong) return;
-
     try {
       const resp = await fetch("/api/approveSong", {
         method: "POST",
@@ -130,7 +124,6 @@ export default function VerifyPage() {
       if (!resp.ok) {
         throw new Error(result.error || "Failed to approve song");
       }
-
       setSnackbar({
         open: true,
         message: result.message || "Song approved!",
@@ -153,11 +146,11 @@ export default function VerifyPage() {
     return <Typography sx={{ p: 3 }}>Loading markers...</Typography>;
   }
 
-  if (songError) {
+  if (songError || contextError) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
-          {songError}
+          {songError || contextError}
         </Typography>
       </Box>
     );
@@ -188,9 +181,14 @@ export default function VerifyPage() {
         Approve This Song
       </Button>
 
-      <WaveformViewer
-        onInit={(ref) => {
-          containerRef.current = ref.current;
+      {/* The wave container from context => #waveform */}
+      <Box
+        id="waveform"
+        sx={{
+          width: "100%",
+          height: 100,
+          backgroundColor: "#eee",
+          mb: 2,
         }}
       />
 

@@ -1,7 +1,11 @@
+/* --------------------------------------------
+ * src/app/edit/page.js
+ * --------------------------------------------
+ */
+
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import PropTypes from "prop-types";
 import {
   Box,
   Typography,
@@ -15,29 +19,35 @@ import { useRouter } from "next/navigation";
 
 import { useSongContext } from "@/context/SongContext";
 import useMarkerEditor from "@/hooks/useMarkerEditor";
-import SnippetWaveSurfer from "@/components/SnippetWaveSurfer";
-import EditMarkerGrid from "@/components/EditMarkerGrid";
 import { downloadJSONFile } from "@/utils/jsonHandler";
+import EditMarkerGrid from "@/components/EditMarkerGrid";
 
 import styles from "./EditPage.module.css";
 
+/**
+ * The Edit Page uses the single wave from context with #waveform.
+ * Double-click or snippet logic is handled in context if needed.
+ */
 export default function EditPage() {
   const router = useRouter();
-  const { selectedSong } = useSongContext();
+  const {
+    selectedSong,
+    loadSong,
+    snippetPlayback, // if you want snippet approach
+    stopAudio,
+    cleanupWaveSurfer,
+  } = useSongContext();
 
-  // We’ll fetch the marker data after we confirm `selectedSong`.
+  // local states
   const [songData, setSongData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState("");
-
-  // WaveSurfer reference for snippet playback
-  const waveSurferRef = useRef(null);
 
   // For the "bar length" cascade feature
   const [barLenSeconds, setBarLenSeconds] = useState(3.0);
   const [afterBarNum, setAfterBarNum] = useState("");
 
-  // Snackbar for showing success/error on saves
+  // Snackbar for success/error
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -45,7 +55,7 @@ export default function EditPage() {
   });
 
   /**
-   * 1) If no song selected => show error message right away
+   * If no selectedSong => show error
    */
   useEffect(() => {
     if (!selectedSong) {
@@ -55,7 +65,7 @@ export default function EditPage() {
   }, [selectedSong]);
 
   /**
-   * 2) Fetch marker data from `/markers/<baseName>-markers.json`
+   * Fetch marker data for the chosen song
    */
   useEffect(() => {
     if (!selectedSong) return;
@@ -68,7 +78,6 @@ export default function EditPage() {
       try {
         const baseName = selectedSong.filename.replace(/\.\w+$/, "");
         const markerUrl = `/markers/${baseName}-markers.json`;
-
         const resp = await fetch(markerUrl);
         if (!resp.ok) {
           throw new Error(`Failed to fetch markers: ${resp.status}`);
@@ -76,19 +85,29 @@ export default function EditPage() {
         const data = await resp.json();
         setSongData(data);
       } catch (err) {
-        console.error("Error fetching marker data:", err);
         setErrMsg(err.message || "Error fetching marker data.");
       } finally {
         setLoading(false);
       }
     }
-
     loadMarkers();
   }, [selectedSong]);
 
   /**
-   * 3) useMarkerEditor for local editing
-   *    - sections, shift bars, apply new bar length
+   * load the wave from context => #waveform
+   */
+  useEffect(() => {
+    if (songData && !errMsg) {
+      const audioUrl = `/songs/${selectedSong.filename}`;
+      loadSong(audioUrl);
+    }
+    // On unmount => stop or cleanup wave
+    return () => stopAudio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [songData, errMsg]);
+
+  /**
+   * Our marker editing hook
    */
   const {
     sections,
@@ -98,15 +117,15 @@ export default function EditPage() {
   } = useMarkerEditor(songData || {});
 
   /**
-   * 4) Snippet Playback
-   *    - We pass (start, end) to waveSurferRef.current?.playSnippet(...)
+   * snippet or bar playback. If you want double-click on the wave => do in context.
+   * This is just for the bar playback in the UI.
    */
-  const handlePlayBar = useCallback((start, end) => {
-    waveSurferRef.current?.playSnippet(start, end);
-  }, []);
+  const handlePlayBar = useCallback((startSec, endSec) => {
+    snippetPlayback(startSec, endSec - startSec);
+  }, [snippetPlayback]);
 
   /**
-   * 5) Save Markers => calls the `PUT /api/markers` endpoint to update existing markers
+   * Save Markers => PUT /api/markers
    */
   const handleSave = async () => {
     const updated = finalizeAndGetJSON();
@@ -119,8 +138,6 @@ export default function EditPage() {
       return;
     }
     try {
-      // The API expects => { songId, ...rest }
-      // We assume updated.songId is present
       const resp = await fetch("/api/markers", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -130,14 +147,12 @@ export default function EditPage() {
       if (!resp.ok) {
         throw new Error(result.error || "Failed to update markers");
       }
-      console.log("Markers updated:", result);
       setSnackbar({
         open: true,
         message: "Markers updated successfully!",
         severity: "success",
       });
     } catch (err) {
-      console.error("Save error:", err);
       setSnackbar({
         open: true,
         message: `Save failed: ${err.message}`,
@@ -147,7 +162,7 @@ export default function EditPage() {
   };
 
   /**
-   * 6) (Optional) Save Old => downloads a local JSON file for backup
+   * Download older version of the JSON for local backups
    */
   const handleSaveOld = () => {
     const updated = finalizeAndGetJSON();
@@ -156,11 +171,11 @@ export default function EditPage() {
   };
 
   /**
-   * 7) Apply new bar length after a specific bar
+   * applyNewBarLengthAfterBar => barId => bar-##, newLen => barLenSeconds
    */
   const handleApplyBarLen = () => {
     if (!afterBarNum) {
-      console.warn("No bar number typed in the text field!");
+      console.warn("No bar number typed!");
       return;
     }
     const barId = `bar-${afterBarNum}`;
@@ -168,9 +183,9 @@ export default function EditPage() {
     applyNewBarLengthAfterBar(barId, roundedLen);
   };
 
-  /**
-   * 8) UI Rendering
-   */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────────
   if (loading) {
     return <Typography sx={{ p: 3 }}>Loading markers...</Typography>;
   }
@@ -187,30 +202,34 @@ export default function EditPage() {
 
   return (
     <div className={styles.container}>
-      {/* TOP SECTION / HEADER */}
       <div className={styles.topSection}>
         <Typography variant="h4" gutterBottom>
           Edit: {selectedSong.filename}
         </Typography>
 
-        {/* WaveSurfer snippet player */}
-        <SnippetWaveSurfer
-          audioUrl={`/songs/${selectedSong.filename}`}
-          ref={waveSurferRef}
+        {/* The wave container => #waveform */}
+        <Box
+          id="waveform"
+          sx={{
+            width: "100%",
+            height: 100,
+            backgroundColor: "#eee",
+            mb: 2,
+          }}
         />
 
         {/* Bar length slider */}
         <Box sx={{ mb: 2 }}>
           <Typography gutterBottom>
-            Bar Length: {barLenSeconds.toFixed(1)} sec
+            Bar Length: {barLenSeconds.toFixed(2)} sec
           </Typography>
           <Slider
             min={0.1}
-            max={12}
-            step={0.1}
+            max={6}
+            step={0.01}
             value={barLenSeconds}
             onChange={(_, val) => setBarLenSeconds(val)}
-            sx={{ width: 250 }}
+            sx={{ width: 500 }}
           />
         </Box>
 
@@ -226,23 +245,25 @@ export default function EditPage() {
           <Button variant="contained" onClick={handleApplyBarLen}>
             Apply
           </Button>
-                    <Button variant="contained" onClick={handleSave}>
+          <Button variant="contained" onClick={handleSave}>
             Save Markers
           </Button>
+          <Button variant="outlined" onClick={handleSaveOld}>
+            Export JSON
+          </Button>
         </Box>
-
       </div>
 
-      {/* SCROLLABLE BARS for editing */}
+      {/* SCROLLABLE BARS */}
       <div className={styles.barsScroll}>
         <EditMarkerGrid
           sections={sections}
           onAdjustBarTime={adjustBarTime}
-          onPlayBar={handlePlayBar}
+          onPlayBar={(start, end) => handlePlayBar(start, end)}
         />
       </div>
 
-      {/* Snackbar for success/error messages */}
+      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -260,7 +281,3 @@ export default function EditPage() {
     </div>
   );
 }
-
-EditPage.propTypes = {
-  // no external props, using SongContext
-};
