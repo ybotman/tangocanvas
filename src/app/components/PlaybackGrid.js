@@ -51,6 +51,7 @@ export default function PlaybackGrid({ onPlaySnippet }) {
           <Button
             key={section.label}
             variant="contained"
+            size="small" 
             onClick={() => handleButtonClick(section.start)}
           >
             {section.label}

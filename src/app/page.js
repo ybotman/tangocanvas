@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -10,6 +10,8 @@ import {
   Button,
   Snackbar,
   Alert,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useSongContext } from "./context/SongContext";
@@ -23,6 +25,10 @@ export default function Page() {
   const { songs, loading, error, selectedSong, setSelectedSong } =
     useSongContext();
 
+  // **New**: Filter states
+  const [filterMatched, setFilterMatched] = useState(false);
+  const [filterApproved, setFilterApproved] = useState(false);
+
   // Snackbar for the "Generate" and "Copy-Latest" placeholder actions
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -30,61 +36,43 @@ export default function Page() {
     severity: "info",
   });
 
-  /**
-   * Dismiss the Snackbar.
-   */
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Filters
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // Filtering logic: OR approach (if either filter is set, keep items that match either):
+  //   - If neither filter is on => show all
+  //   - If filterMatched is on => pass if state === "Matched"
+  //   - If filterApproved is on => pass if state === "Approved"
+  //   - If both are on => pass if "Matched" OR "Approved"
+  const filteredSongs = songs.filter((song) => {
+    const noFilters = !filterMatched && !filterApproved;
+    if (noFilters) return true;
+
+    const isMatched = filterMatched && song.state === "Matched";
+    const isApproved = filterApproved && song.state === "Approved";
+    return isMatched || isApproved;
+  });
 
   /**
-   * "Generate" placeholder
+   * If the currently selectedSong is no longer in filteredSongs,
+   * we can reset it to null. That ensures toggling a filter
+   * immediately affects the selection.
    */
-  const handleGenerate = () => {
-    setSnackbar({
-      open: true,
-      message: "Generate function is under development.",
-      severity: "warning",
-    });
-  };
-
-  /**
-   * "Copy-Latest" placeholder
-   */
-  const handleCopyLatest = () => {
-    setSnackbar({
-      open: true,
-      message: "Copy-Latest function is under development.",
-      severity: "warning",
-    });
-  };
-
-  /**
-   * Navigate to the requested page if we have a valid selectedSong.
-   */
-  const handleNavigation = (target) => {
-    if (!selectedSong) return; // guard
-
-    switch (target) {
-      case "play":
-        router.push("/play");
-        break;
-      case "edit":
-        router.push("/edit");
-        break;
-      case "verify":
-        router.push("/verify");
-        break;
-      default:
-        break;
+  useEffect(() => {
+    if (
+      selectedSong &&
+      !filteredSongs.find((s) => s.filename === selectedSong.filename)
+    ) {
+      setSelectedSong(null);
     }
-  };
+    // Only run when toggles or songs/selectedSong change
+  }, [filterMatched, filterApproved, filteredSongs, selectedSong, setSelectedSong]);
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // RENDER: Handle loading, errors, or empty song list first.
+  // UI logic for load/error/no-songs
   // ─────────────────────────────────────────────────────────────────────────────
 
-  // 1) Loading
   if (loading) {
     return (
       <Box>
@@ -94,7 +82,6 @@ export default function Page() {
     );
   }
 
-  // 2) Error
   if (error) {
     return (
       <Box>
@@ -106,7 +93,6 @@ export default function Page() {
     );
   }
 
-  // 3) No songs
   if (songs.length === 0) {
     return (
       <Box>
@@ -120,7 +106,52 @@ export default function Page() {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // MAIN UI
+  // Handler placeholders
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleGenerate = () => {
+    setSnackbar({
+      open: true,
+      message: "Generate function is under development.",
+      severity: "warning",
+    });
+  };
+
+  const handleCopyLatest = () => {
+    setSnackbar({
+      open: true,
+      message: "Copy-Latest function is under development.",
+      severity: "warning",
+    });
+  };
+
+  const handleNavigation = (target) => {
+    if (!selectedSong) return; // guard
+
+    switch (target) {
+      case "play":
+        router.push("/play");
+        break;
+      case "edit":
+        router.push("/edit");
+        break;
+      case "verify":
+        router.push("/verify");
+        break;
+      case "autogen":
+        router.push("/autogen");
+        break;
+      default:
+        break;
+    }
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Main UI
   // ─────────────────────────────────────────────────────────────────────────────
 
   return (
@@ -135,13 +166,36 @@ export default function Page() {
         </Typography>
       </Box>
 
-      {/* SONG SELECTION DROPDOWN */}
+      {/* TWO SWITCHES (toggle filters) */}
+      <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={filterMatched}
+              onChange={(e) => setFilterMatched(e.target.checked)}
+              color="secondary"
+            />
+          }
+          label="Matched Only"
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={filterApproved}
+              onChange={(e) => setFilterApproved(e.target.checked)}
+              color="secondary"
+            />
+          }
+          label="Approved Only"
+        />
+      </Box>
+
+      {/* SONG SELECTION DROPDOWN (filteredSongs) */}
       <Box className={styles.searchSection}>
         <Autocomplete
-          options={songs}
+          options={filteredSongs}
           // We'll show "filename (state)" in the dropdown
           getOptionLabel={(option) => `${option.filename} (${option.state})`}
-          // Force the dropdown to start unselected by referencing "selectedSong" in context
           value={selectedSong || null}
           onChange={(_, newValue) => setSelectedSong(newValue || null)}
           renderInput={(params) => (
@@ -176,7 +230,7 @@ export default function Page() {
             </Button>
           )}
 
-          {/* Matched => Verify-Play + Edit */}
+          {/* Matched => Verify + Edit + AutoGen */}
           {selectedSong.state === "Matched" && (
             <>
               <Button
@@ -190,6 +244,13 @@ export default function Page() {
                 onClick={() => handleNavigation("edit")}
               >
                 Edit
+              </Button>
+              <Button
+                variant="outlined"
+                color="info"
+                onClick={() => handleNavigation("autogen")}
+              >
+                AutoGen
               </Button>
             </>
           )}

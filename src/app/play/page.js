@@ -1,75 +1,59 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Typography, Button } from "@mui/material";
 import { useSongContext } from "@/context/SongContext";
-import useWaveSurfer from "@/hooks/useWaveSurfer";
-import WaveformViewer from "@/components/WaveFormViewer";
 import MarkerGrid from "@/components/MarkerGrid";
 
 export default function PlayPage() {
-  const { selectedSong } = useSongContext();
+  const {
+    selectedSong,
+    loadSong,
+    togglePlay,
+    stopAudio,
+    // If you want to do snippet playback from context, you can expose a “playSnippet” method too
+  } = useSongContext();
 
   // Local states to handle marker JSON
   const [markerData, setMarkerData] = useState(null);
   const [songLoading, setSongLoading] = useState(true);
   const [songError, setSongError] = useState("");
 
-  // WaveSurfer integration
-  const containerRef = useRef(null);
-  const {
-    initWaveSurfer,
-    loadSong,
-    playSnippet,
-    zoomToBar,
-    cleanupWaveSurfer,
-    isReady,
-  } = useWaveSurfer({ containerRef });
-
   /**
-   * 1) If no selectedSong is present, user might have navigated here manually
-   *    without choosing a song. Show an error message or redirect.
+   * 1) If user navigated here without selecting a song, show error.
    */
   useEffect(() => {
     if (!selectedSong) {
-      setSongError(
-        "No song selected. Please return to the main page and select a song.",
-      );
+      setSongError("No song selected. Please return to the main page.");
       setSongLoading(false);
     }
   }, [selectedSong]);
 
   /**
-   * 2) Fetch the marker JSON for the selectedSong, along with audio
+   * 2) Load marker data once we have a selectedSong
    */
   useEffect(() => {
     if (!selectedSong) return;
 
     async function loadMarkerData() {
-      setSongLoading(true);
       setSongError("");
+      setSongLoading(true);
       setMarkerData(null);
 
       try {
         const baseName = selectedSong.filename.replace(/\.\w+$/, "");
-        const audioUrl = `/songs/${selectedSong.filename}`;
         const markerUrl = `/markers/${baseName}-markers.json`;
 
-        // Fetch marker JSON
+        // 1) Fetch marker JSON
         const resp = await fetch(markerUrl);
         if (!resp.ok) {
-          throw new Error(
-            `Failed to load marker JSON at ${markerUrl} (${resp.status})`,
-          );
+          throw new Error(`Marker JSON not found (${resp.status}) at ${markerUrl}`);
         }
         const data = await resp.json();
 
-        // Insert the audioUrl so MarkerGrid or waveSurfer can use it
-        data.audioUrl = audioUrl;
-
         setMarkerData(data);
       } catch (err) {
-        setSongError(err.message || "Error fetching marker data");
+        setSongError(err.message || "Error loading marker data.");
       } finally {
         setSongLoading(false);
       }
@@ -79,42 +63,23 @@ export default function PlayPage() {
   }, [selectedSong]);
 
   /**
-   * 3) Once markerData is fetched, initialize WaveSurfer & load the audio
+   * 3) Once we have a selectedSong + markerData => ask SongContext to load the audio
+   *    The container for WaveSurfer is #waveform (see below).
    */
   useEffect(() => {
-    if (songLoading || !markerData || songError) return;
+    if (!songLoading && markerData && !songError) {
+      // The URL to load in WaveSurfer
+      const audioUrl = `/songs/${selectedSong.filename}`;
+      loadSong(audioUrl); // from SongContext
+    }
 
-    initWaveSurfer();
-    loadSong(markerData.audioUrl);
-
-    // Cleanup
-    return cleanupWaveSurfer;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songLoading, markerData, songError]);
-
-  /**
-   * 4) Handle "play snippet" from a bar
-   */
-  const handlePlayBar = useCallback(
-    (bar) => {
-      if (!isReady || !markerData) return;
-      const { start } = bar;
-
-      // Example snippet: 4.5 seconds
-      playSnippet(start, 4.5);
-
-      // Zoom to ~3 bars around
-      // If your markerData includes full `duration`, you can pass it here
-      zoomToBar(start, markerData.duration || 180, 3);
-    },
-    [isReady, markerData, playSnippet, zoomToBar],
-  );
+    // Stop audio on unmount
+    return () => stopAudio();
+  }, [songLoading, markerData, songError, selectedSong, loadSong, stopAudio]);
 
   // ─────────────────────────────────────────────────────────────────────────────
-
-  /**
-   * RENDER LOGIC
-   */
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────────
   if (songLoading) {
     return <Typography sx={{ p: 3 }}>Loading markers...</Typography>;
   }
@@ -133,7 +98,7 @@ export default function PlayPage() {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
-          Marker data not found or empty.
+          No marker data found.
         </Typography>
       </Box>
     );
@@ -145,18 +110,28 @@ export default function PlayPage() {
         Play Page – {markerData.songId || selectedSong.filename}
       </Typography>
 
-      {/* Waveform Container */}
-      <WaveformViewer
-        onInit={(ref) => {
-          containerRef.current = ref.current;
-        }}
+      {/* 1) The WaveSurfer container must match container: "#waveform" in SongContext */}
+      <div
+        id="waveform"
+        style={{ width: "100%", marginBottom: "16px", backgroundColor: "#eee" }}
       />
 
-      {/* Marker Grid */}
-      <MarkerGrid
-        sections={markerData.sections || []}
-        onPlayBar={handlePlayBar}
-      />
+      {/* 2) Example control: togglePlay from context */}
+      <Button variant="contained" onClick={togglePlay} sx={{ mb: 2 }}>
+        Play / Pause
+      </Button>
+
+      {/* 3) MarkerGrid (just for demonstration) */}
+      {Array.isArray(markerData.sections) && (
+        <MarkerGrid
+          sections={markerData.sections}
+          onPlayBar={(bar) => {
+            // If you want snippet playback, you can create a context method,
+            // e.g. "playSnippet(bar.start, 4.5)" inside SongContext
+            console.log("Clicked bar:", bar);
+          }}
+        />
+      )}
     </Box>
   );
 }
