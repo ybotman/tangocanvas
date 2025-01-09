@@ -109,7 +109,7 @@ export default function MarkerGrid({ sections, onPlayBar }) {
             sx={{ height: 8, borderRadius: 4 }}
           />
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Playing snippet... {elapsed.toFixed(1)} / {snippetDuration} s
+            Playing snippet... {elapsed.toFixed(2)} / {snippetDuration} s
           </Typography>
         </Box>
       )}

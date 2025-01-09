@@ -179,7 +179,7 @@ export default function EditPage() {
       return;
     }
     const barId = `bar-${afterBarNum}`;
-    const roundedLen = parseFloat(barLenSeconds.toFixed(1));
+    const roundedLen = parseFloat(barLenSeconds.toFixed(2));
     applyNewBarLengthAfterBar(barId, roundedLen);
   };
 

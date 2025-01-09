@@ -233,7 +233,7 @@ export default function AutoGenPage() {
 
       {/* Last Clicked Time from context */}
       <Typography variant="body1">
-        Last Clicked Time: <strong>{lastClickTime.toFixed(1)}</strong> s
+        Last Clicked Time: <strong>{lastClickTime.toFixed(2)}</strong> s
       </Typography>
 
       <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
@@ -261,10 +261,10 @@ export default function AutoGenPage() {
       </Box>
 
       <Typography variant="body2" sx={{ mt: 2 }}>
-        Section 1 time: {section1Time != null ? section1Time.toFixed(1) : "--"}
+        Section 1 time: {section1Time != null ? section1Time.toFixed(2) : "--"}
       </Typography>
       <Typography variant="body2" sx={{ mb: 2 }}>
-        Section 2 time: {section2Time != null ? section2Time.toFixed(1) : "--"}
+        Section 2 time: {section2Time != null ? section2Time.toFixed(2) : "--"}
       </Typography>
 
       <Snackbar

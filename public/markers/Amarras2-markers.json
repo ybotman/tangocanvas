@@ -19,188 +19,188 @@
         {
           "id": "bar-2",
           "label": "Bar 2",
-          "start": 0.7999999999999988,
-          "end": 2.4999999999999987
+          "start": 0.8,
+          "end": 6.8
         },
         {
           "id": "bar-3",
           "label": "Bar 3",
-          "start": 2.4999999999999987,
-          "end": 4.200000000000005
+          "start": 6.8,
+          "end": 12.8
         },
         {
           "id": "bar-4",
           "label": "Bar 4",
-          "start": 4.200000000000005,
-          "end": 5.900000000000005
+          "start": 12.8,
+          "end": 18.8
         },
         {
           "id": "bar-5",
           "label": "Bar 5",
-          "start": 5.900000000000005,
-          "end": 7.600000000000005
+          "start": 18.8,
+          "end": 24.8
         },
         {
           "id": "bar-6",
           "label": "Bar 6",
-          "start": 7.600000000000005,
-          "end": 9.300000000000006
+          "start": 24.8,
+          "end": 30.8
         },
         {
           "id": "bar-7",
           "label": "Bar 7",
-          "start": 9.300000000000006,
-          "end": 11.000000000000005
+          "start": 30.8,
+          "end": 36.8
         },
         {
           "id": "bar-8",
           "label": "Bar 8",
-          "start": 11.000000000000005,
-          "end": 12.700000000000005
+          "start": 36.8,
+          "end": 42.8
         },
         {
           "id": "bar-9",
           "label": "Bar 9",
-          "start": 12.700000000000005,
-          "end": 14.400000000000006
+          "start": 42.8,
+          "end": 48.8
         },
         {
           "id": "bar-10",
           "label": "Bar 10",
-          "start": 14.400000000000006,
-          "end": 16.09999999999998
+          "start": 48.8,
+          "end": 54.8
         },
         {
           "id": "bar-11",
           "label": "Bar 11",
-          "start": 16.09999999999998,
-          "end": 17.79999999999998
+          "start": 54.8,
+          "end": 60.8
         },
         {
           "id": "bar-12",
           "label": "Bar 12",
-          "start": 17.79999999999998,
-          "end": 19.49999999999998
+          "start": 60.8,
+          "end": 66.8
         },
         {
           "id": "bar-13",
           "label": "Bar 13",
-          "start": 19.49999999999998,
-          "end": 21.199999999999978
+          "start": 66.8,
+          "end": 72.8
         },
         {
           "id": "bar-14",
           "label": "Bar 14",
-          "start": 21.199999999999978,
-          "end": 22.899999999999977
+          "start": 72.8,
+          "end": 78.8
         },
         {
           "id": "bar-15",
           "label": "Bar 15",
-          "start": 22.899999999999977,
-          "end": 24.59999999999998
+          "start": 78.8,
+          "end": 84.8
         },
         {
           "id": "bar-16",
           "label": "Bar 16",
-          "start": 24.59999999999998,
-          "end": 26.29999999999998
+          "start": 84.8,
+          "end": 90.8
         },
         {
           "id": "bar-17",
           "label": "Bar 17",
-          "start": 26.29999999999998,
-          "end": 27.99999999999998
+          "start": 90.8,
+          "end": 96.8
         },
         {
           "id": "bar-18",
           "label": "Bar 18",
-          "start": 27.99999999999998,
-          "end": 29.699999999999978
+          "start": 96.8,
+          "end": 102.8
         },
         {
           "id": "bar-19",
           "label": "Bar 19",
-          "start": 29.699999999999978,
-          "end": 31.399999999999977
+          "start": 102.8,
+          "end": 108.8
         },
         {
           "id": "bar-20",
           "label": "Bar 20",
-          "start": 31.399999999999977,
-          "end": 33.09999999999998
+          "start": 108.8,
+          "end": 114.8
         },
         {
           "id": "bar-21",
           "label": "Bar 21",
-          "start": 33.09999999999998,
-          "end": 34.799999999999976
+          "start": 114.8,
+          "end": 120.8
         },
         {
           "id": "bar-22",
           "label": "Bar 22",
-          "start": 34.799999999999976,
-          "end": 36.49999999999998
+          "start": 120.8,
+          "end": 126.8
         },
         {
           "id": "bar-23",
           "label": "Bar 23",
-          "start": 36.49999999999998,
-          "end": 38.19999999999998
+          "start": 126.8,
+          "end": 132.8
         },
         {
           "id": "bar-24",
           "label": "Bar 24",
-          "start": 38.19999999999998,
-          "end": 39.89999999999998
+          "start": 132.8,
+          "end": 138.8
         },
         {
           "id": "bar-25",
           "label": "Bar 25",
-          "start": 39.89999999999998,
-          "end": 41.59999999999998
+          "start": 138.8,
+          "end": 144.8
         },
         {
           "id": "bar-26",
           "label": "Bar 26",
-          "start": 41.59999999999998,
-          "end": 43.299999999999976
+          "start": 144.8,
+          "end": 150.8
         },
         {
           "id": "bar-27",
           "label": "Bar 27",
-          "start": 43.299999999999976,
-          "end": 44.99999999999998
+          "start": 150.8,
+          "end": 156.8
         },
         {
           "id": "bar-28",
           "label": "Bar 28",
-          "start": 44.99999999999998,
-          "end": 46.69999999999998
+          "start": 156.8,
+          "end": 162.8
         },
         {
           "id": "bar-29",
           "label": "Bar 29",
-          "start": 46.69999999999998,
-          "end": 48.39999999999998
+          "start": 162.8,
+          "end": 168.8
         },
         {
           "id": "bar-30",
           "label": "Bar 30",
-          "start": 48.39999999999998,
-          "end": 50.09999999999998
+          "start": 168.8,
+          "end": 174.8
         },
         {
           "id": "bar-31",
           "label": "Bar 31",
-          "start": 50.09999999999998,
-          "end": 51.799999999999976
+          "start": 174.8,
+          "end": 180.8
         },
         {
           "id": "bar-32",
           "label": "Bar 32",
-          "start": 51.799999999999976,
-          "end": 53.49999999999998
+          "start": 180.8,
+          "end": 186.8
         }
       ]
     },
@@ -214,194 +214,194 @@
         {
           "id": "bar-33",
           "label": "Bar 1",
-          "start": 55,
-          "end": 56.7
+          "start": 186.8,
+          "end": 192.8
         },
         {
           "id": "bar-34",
           "label": "Bar 2",
-          "start": 56.7,
-          "end": 58.4
+          "start": 192.8,
+          "end": 198.8
         },
         {
           "id": "bar-35",
           "label": "Bar 3",
-          "start": 58.4,
-          "end": 60.1
+          "start": 198.8,
+          "end": 204.8
         },
         {
           "id": "bar-36",
           "label": "Bar 4",
-          "start": 60.1,
-          "end": 61.8
+          "start": 204.8,
+          "end": 210.8
         },
         {
           "id": "bar-37",
           "label": "Bar 5",
-          "start": 61.8,
-          "end": 63.5
+          "start": 210.8,
+          "end": 216.8
         },
         {
           "id": "bar-38",
           "label": "Bar 6",
-          "start": 63.5,
-          "end": 65.2
+          "start": 216.8,
+          "end": 222.8
         },
         {
           "id": "bar-39",
           "label": "Bar 7",
-          "start": 65.2,
-          "end": 66.9
+          "start": 222.8,
+          "end": 228.8
         },
         {
           "id": "bar-40",
           "label": "Bar 8",
-          "start": 66.9,
-          "end": 68.6
+          "start": 228.8,
+          "end": 234.8
         },
         {
           "id": "bar-41",
           "label": "Bar 9",
-          "start": 68.6,
-          "end": 70.3
+          "start": 234.8,
+          "end": 240.8
         },
         {
           "id": "bar-42",
           "label": "Bar 10",
-          "start": 70.3,
-          "end": 72
+          "start": 240.8,
+          "end": 246.8
         },
         {
           "id": "bar-43",
           "label": "Bar 11",
-          "start": 72,
-          "end": 73.7
+          "start": 246.8,
+          "end": 252.8
         },
         {
           "id": "bar-44",
           "label": "Bar 12",
-          "start": 73.7,
-          "end": 75.4
+          "start": 252.8,
+          "end": 258.8
         },
         {
           "id": "bar-45",
           "label": "Bar 13",
-          "start": 75.4,
-          "end": 77.1
+          "start": 258.8,
+          "end": 264.8
         },
         {
           "id": "bar-46",
           "label": "Bar 14",
-          "start": 77.1,
-          "end": 78.8
+          "start": 264.8,
+          "end": 270.8
         },
         {
           "id": "bar-47",
           "label": "Bar 15",
-          "start": 78.8,
-          "end": 80.5
+          "start": 270.8,
+          "end": 276.8
         },
         {
           "id": "bar-48",
           "label": "Bar 16",
-          "start": 80.5,
-          "end": 82.2
+          "start": 276.8,
+          "end": 282.8
         },
         {
           "id": "bar-49",
           "label": "Bar 17",
-          "start": 82.2,
-          "end": 83.9
+          "start": 282.8,
+          "end": 288.8
         },
         {
           "id": "bar-50",
           "label": "Bar 18",
-          "start": 83.9,
-          "end": 85.6
+          "start": 288.8,
+          "end": 294.8
         },
         {
           "id": "bar-51",
           "label": "Bar 19",
-          "start": 85.6,
-          "end": 87.3
+          "start": 294.8,
+          "end": 300.8
         },
         {
           "id": "bar-52",
           "label": "Bar 20",
-          "start": 87.3,
-          "end": 89
+          "start": 300.8,
+          "end": 306.8
         },
         {
           "id": "bar-53",
           "label": "Bar 21",
-          "start": 89,
-          "end": 90.7
+          "start": 306.8,
+          "end": 312.8
         },
         {
           "id": "bar-54",
           "label": "Bar 22",
-          "start": 90.7,
-          "end": 92.4
+          "start": 312.8,
+          "end": 318.8
         },
         {
           "id": "bar-55",
           "label": "Bar 23",
-          "start": 92.4,
-          "end": 94.1
+          "start": 318.8,
+          "end": 324.8
         },
         {
           "id": "bar-56",
           "label": "Bar 24",
-          "start": 94.1,
-          "end": 95.8
+          "start": 324.8,
+          "end": 330.8
         },
         {
           "id": "bar-57",
           "label": "Bar 25",
-          "start": 95.8,
-          "end": 97.5
+          "start": 330.8,
+          "end": 336.8
         },
         {
           "id": "bar-58",
           "label": "Bar 26",
-          "start": 97.5,
-          "end": 99.2
+          "start": 336.8,
+          "end": 342.8
         },
         {
           "id": "bar-59",
           "label": "Bar 27",
-          "start": 99.2,
-          "end": 100.9
+          "start": 342.8,
+          "end": 348.8
         },
         {
           "id": "bar-60",
           "label": "Bar 28",
-          "start": 100.9,
-          "end": 102.6
+          "start": 348.8,
+          "end": 354.8
         },
         {
           "id": "bar-61",
           "label": "Bar 29",
-          "start": 102.6,
-          "end": 104.3
+          "start": 354.8,
+          "end": 360.8
         },
         {
           "id": "bar-62",
           "label": "Bar 30",
-          "start": 104.3,
-          "end": 106
+          "start": 360.8,
+          "end": 366.8
         },
         {
           "id": "bar-63",
           "label": "Bar 31",
-          "start": 106,
-          "end": 107.7
+          "start": 366.8,
+          "end": 372.8
         },
         {
           "id": "bar-64",
           "label": "Bar 32",
-          "start": 107.7,
-          "end": 109.4
+          "start": 372.8,
+          "end": 378.8
         }
       ]
     },
@@ -415,194 +415,194 @@
         {
           "id": "bar-65",
           "label": "Bar 1",
-          "start": 109.4,
-          "end": 111.1
+          "start": 378.8,
+          "end": 384.8
         },
         {
           "id": "bar-66",
           "label": "Bar 2",
-          "start": 111.1,
-          "end": 112.8
+          "start": 384.8,
+          "end": 390.8
         },
         {
           "id": "bar-67",
           "label": "Bar 3",
-          "start": 112.8,
-          "end": 114.5
+          "start": 390.8,
+          "end": 396.8
         },
         {
           "id": "bar-68",
           "label": "Bar 4",
-          "start": 114.5,
-          "end": 116.2
+          "start": 396.8,
+          "end": 402.8
         },
         {
           "id": "bar-69",
           "label": "Bar 5",
-          "start": 116.2,
-          "end": 117.9
+          "start": 402.8,
+          "end": 408.8
         },
         {
           "id": "bar-70",
           "label": "Bar 6",
-          "start": 117.9,
-          "end": 119.6
+          "start": 408.8,
+          "end": 414.8
         },
         {
           "id": "bar-71",
           "label": "Bar 7",
-          "start": 119.6,
-          "end": 121.3
+          "start": 414.8,
+          "end": 420.8
         },
         {
           "id": "bar-72",
           "label": "Bar 8",
-          "start": 121.3,
-          "end": 123
+          "start": 420.8,
+          "end": 426.8
         },
         {
           "id": "bar-73",
           "label": "Bar 9",
-          "start": 123,
-          "end": 124.7
+          "start": 426.8,
+          "end": 432.8
         },
         {
           "id": "bar-74",
           "label": "Bar 10",
-          "start": 124.7,
-          "end": 126.4
+          "start": 432.8,
+          "end": 438.8
         },
         {
           "id": "bar-75",
           "label": "Bar 11",
-          "start": 126.4,
-          "end": 128.1
+          "start": 438.8,
+          "end": 444.8
         },
         {
           "id": "bar-76",
           "label": "Bar 12",
-          "start": 128.1,
-          "end": 129.8
+          "start": 444.8,
+          "end": 450.8
         },
         {
           "id": "bar-77",
           "label": "Bar 13",
-          "start": 129.8,
-          "end": 131.5
+          "start": 450.8,
+          "end": 456.8
         },
         {
           "id": "bar-78",
           "label": "Bar 14",
-          "start": 131.5,
-          "end": 133.2
+          "start": 456.8,
+          "end": 462.8
         },
         {
           "id": "bar-79",
           "label": "Bar 15",
-          "start": 133.2,
-          "end": 134.9
+          "start": 462.8,
+          "end": 468.8
         },
         {
           "id": "bar-80",
           "label": "Bar 16",
-          "start": 134.9,
-          "end": 136.6
+          "start": 468.8,
+          "end": 474.8
         },
         {
           "id": "bar-81",
           "label": "Bar 17",
-          "start": 136.6,
-          "end": 138.3
+          "start": 474.8,
+          "end": 480.8
         },
         {
           "id": "bar-82",
           "label": "Bar 18",
-          "start": 138.3,
-          "end": 140
+          "start": 480.8,
+          "end": 486.8
         },
         {
           "id": "bar-83",
           "label": "Bar 19",
-          "start": 140,
-          "end": 141.7
+          "start": 486.8,
+          "end": 492.8
         },
         {
           "id": "bar-84",
           "label": "Bar 20",
-          "start": 141.7,
-          "end": 143.4
+          "start": 492.8,
+          "end": 498.8
         },
         {
           "id": "bar-85",
           "label": "Bar 21",
-          "start": 143.4,
-          "end": 145.1
+          "start": 498.8,
+          "end": 504.8
         },
         {
           "id": "bar-86",
           "label": "Bar 22",
-          "start": 145.1,
-          "end": 146.8
+          "start": 504.8,
+          "end": 510.8
         },
         {
           "id": "bar-87",
           "label": "Bar 23",
-          "start": 146.8,
-          "end": 148.5
+          "start": 510.8,
+          "end": 516.8
         },
         {
           "id": "bar-88",
           "label": "Bar 24",
-          "start": 148.5,
-          "end": 150.2
+          "start": 516.8,
+          "end": 522.8
         },
         {
           "id": "bar-89",
           "label": "Bar 25",
-          "start": 150.2,
-          "end": 151.9
+          "start": 522.8,
+          "end": 528.8
         },
         {
           "id": "bar-90",
           "label": "Bar 26",
-          "start": 151.9,
-          "end": 153.6
+          "start": 528.8,
+          "end": 534.8
         },
         {
           "id": "bar-91",
           "label": "Bar 27",
-          "start": 153.6,
-          "end": 155.3
+          "start": 534.8,
+          "end": 540.8
         },
         {
           "id": "bar-92",
           "label": "Bar 28",
-          "start": 155.3,
-          "end": 157
+          "start": 540.8,
+          "end": 546.8
         },
         {
           "id": "bar-93",
           "label": "Bar 29",
-          "start": 157,
-          "end": 158.7
+          "start": 546.8,
+          "end": 552.8
         },
         {
           "id": "bar-94",
           "label": "Bar 30",
-          "start": 158.7,
-          "end": 160.4
+          "start": 552.8,
+          "end": 558.8
         },
         {
           "id": "bar-95",
           "label": "Bar 31",
-          "start": 160.4,
-          "end": 162.1
+          "start": 558.8,
+          "end": 564.8
         },
         {
           "id": "bar-96",
           "label": "Bar 32",
-          "start": 162.1,
-          "end": 163.8
+          "start": 564.8,
+          "end": 570.8
         }
       ]
     }

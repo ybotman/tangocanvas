@@ -1,0 +1,609 @@
+{
+  "songId": "Amarras3",
+  "duration": 288,
+  "sections": [
+    {
+      "id": "section-1",
+      "type": "intro",
+      "label": "Intro Section (1)",
+      "start": 0,
+      "end": 21.15,
+      "markers": [
+        {
+          "id": "bar-1",
+          "label": "Bar 1",
+          "start": 0,
+          "end": 0.7999999999999988
+        },
+        {
+          "id": "bar-2",
+          "label": "Bar 2",
+          "start": 0.8,
+          "end": 6.26
+        },
+        {
+          "id": "bar-3",
+          "label": "Bar 3",
+          "start": 6.26,
+          "end": 11.72
+        },
+        {
+          "id": "bar-4",
+          "label": "Bar 4",
+          "start": 11.72,
+          "end": 17.18
+        },
+        {
+          "id": "bar-5",
+          "label": "Bar 5",
+          "start": 17.18,
+          "end": 22.64
+        },
+        {
+          "id": "bar-6",
+          "label": "Bar 6",
+          "start": 22.64,
+          "end": 28.1
+        },
+        {
+          "id": "bar-7",
+          "label": "Bar 7",
+          "start": 28.1,
+          "end": 33.56
+        },
+        {
+          "id": "bar-8",
+          "label": "Bar 8",
+          "start": 33.56,
+          "end": 39.02
+        },
+        {
+          "id": "bar-9",
+          "label": "Bar 9",
+          "start": 39.02,
+          "end": 44.48
+        },
+        {
+          "id": "bar-10",
+          "label": "Bar 10",
+          "start": 44.48,
+          "end": 49.94
+        },
+        {
+          "id": "bar-11",
+          "label": "Bar 11",
+          "start": 49.94,
+          "end": 55.4
+        },
+        {
+          "id": "bar-12",
+          "label": "Bar 12",
+          "start": 55.4,
+          "end": 60.86
+        },
+        {
+          "id": "bar-13",
+          "label": "Bar 13",
+          "start": 60.86,
+          "end": 66.32
+        },
+        {
+          "id": "bar-14",
+          "label": "Bar 14",
+          "start": 66.32,
+          "end": 71.78
+        },
+        {
+          "id": "bar-15",
+          "label": "Bar 15",
+          "start": 71.78,
+          "end": 77.24
+        },
+        {
+          "id": "bar-16",
+          "label": "Bar 16",
+          "start": 77.24,
+          "end": 82.7
+        },
+        {
+          "id": "bar-17",
+          "label": "Bar 17",
+          "start": 82.7,
+          "end": 88.16
+        },
+        {
+          "id": "bar-18",
+          "label": "Bar 18",
+          "start": 88.16,
+          "end": 93.62
+        },
+        {
+          "id": "bar-19",
+          "label": "Bar 19",
+          "start": 93.62,
+          "end": 99.08
+        },
+        {
+          "id": "bar-20",
+          "label": "Bar 20",
+          "start": 99.08,
+          "end": 104.54
+        },
+        {
+          "id": "bar-21",
+          "label": "Bar 21",
+          "start": 104.54,
+          "end": 110
+        },
+        {
+          "id": "bar-22",
+          "label": "Bar 22",
+          "start": 110,
+          "end": 115.46
+        },
+        {
+          "id": "bar-23",
+          "label": "Bar 23",
+          "start": 115.46,
+          "end": 120.92
+        },
+        {
+          "id": "bar-24",
+          "label": "Bar 24",
+          "start": 120.92,
+          "end": 126.38
+        },
+        {
+          "id": "bar-25",
+          "label": "Bar 25",
+          "start": 126.38,
+          "end": 131.84
+        },
+        {
+          "id": "bar-26",
+          "label": "Bar 26",
+          "start": 131.84,
+          "end": 137.3
+        },
+        {
+          "id": "bar-27",
+          "label": "Bar 27",
+          "start": 137.3,
+          "end": 142.76
+        },
+        {
+          "id": "bar-28",
+          "label": "Bar 28",
+          "start": 142.76,
+          "end": 148.22
+        },
+        {
+          "id": "bar-29",
+          "label": "Bar 29",
+          "start": 148.22,
+          "end": 153.68
+        },
+        {
+          "id": "bar-30",
+          "label": "Bar 30",
+          "start": 153.68,
+          "end": 159.14
+        },
+        {
+          "id": "bar-31",
+          "label": "Bar 31",
+          "start": 159.14,
+          "end": 164.6
+        },
+        {
+          "id": "bar-32",
+          "label": "Bar 32",
+          "start": 164.6,
+          "end": 170.06
+        }
+      ]
+    },
+    {
+      "id": "section-2",
+      "type": "section",
+      "label": "Main Section (2)",
+      "start": 32.4,
+      "end": 64.4,
+      "markers": [
+        {
+          "id": "bar-33",
+          "label": "Bar 1",
+          "start": 170.06,
+          "end": 175.52
+        },
+        {
+          "id": "bar-34",
+          "label": "Bar 2",
+          "start": 175.52,
+          "end": 180.98
+        },
+        {
+          "id": "bar-35",
+          "label": "Bar 3",
+          "start": 180.98,
+          "end": 186.44
+        },
+        {
+          "id": "bar-36",
+          "label": "Bar 4",
+          "start": 186.44,
+          "end": 191.9
+        },
+        {
+          "id": "bar-37",
+          "label": "Bar 5",
+          "start": 191.9,
+          "end": 197.36
+        },
+        {
+          "id": "bar-38",
+          "label": "Bar 6",
+          "start": 197.36,
+          "end": 202.82
+        },
+        {
+          "id": "bar-39",
+          "label": "Bar 7",
+          "start": 202.82,
+          "end": 208.28
+        },
+        {
+          "id": "bar-40",
+          "label": "Bar 8",
+          "start": 208.28,
+          "end": 213.74
+        },
+        {
+          "id": "bar-41",
+          "label": "Bar 9",
+          "start": 213.74,
+          "end": 219.2
+        },
+        {
+          "id": "bar-42",
+          "label": "Bar 10",
+          "start": 219.2,
+          "end": 224.66
+        },
+        {
+          "id": "bar-43",
+          "label": "Bar 11",
+          "start": 224.66,
+          "end": 230.12
+        },
+        {
+          "id": "bar-44",
+          "label": "Bar 12",
+          "start": 230.12,
+          "end": 235.58
+        },
+        {
+          "id": "bar-45",
+          "label": "Bar 13",
+          "start": 235.58,
+          "end": 241.04
+        },
+        {
+          "id": "bar-46",
+          "label": "Bar 14",
+          "start": 241.04,
+          "end": 246.5
+        },
+        {
+          "id": "bar-47",
+          "label": "Bar 15",
+          "start": 246.5,
+          "end": 251.96
+        },
+        {
+          "id": "bar-48",
+          "label": "Bar 16",
+          "start": 251.96,
+          "end": 257.42
+        },
+        {
+          "id": "bar-49",
+          "label": "Bar 17",
+          "start": 257.42,
+          "end": 262.88
+        },
+        {
+          "id": "bar-50",
+          "label": "Bar 18",
+          "start": 262.88,
+          "end": 268.34
+        },
+        {
+          "id": "bar-51",
+          "label": "Bar 19",
+          "start": 268.34,
+          "end": 273.8
+        },
+        {
+          "id": "bar-52",
+          "label": "Bar 20",
+          "start": 273.8,
+          "end": 279.26
+        },
+        {
+          "id": "bar-53",
+          "label": "Bar 21",
+          "start": 279.26,
+          "end": 284.72
+        },
+        {
+          "id": "bar-54",
+          "label": "Bar 22",
+          "start": 284.72,
+          "end": 290.18
+        },
+        {
+          "id": "bar-55",
+          "label": "Bar 23",
+          "start": 290.18,
+          "end": 295.64
+        },
+        {
+          "id": "bar-56",
+          "label": "Bar 24",
+          "start": 295.64,
+          "end": 301.1
+        },
+        {
+          "id": "bar-57",
+          "label": "Bar 25",
+          "start": 301.1,
+          "end": 306.56
+        },
+        {
+          "id": "bar-58",
+          "label": "Bar 26",
+          "start": 306.56,
+          "end": 312.02
+        },
+        {
+          "id": "bar-59",
+          "label": "Bar 27",
+          "start": 312.02,
+          "end": 317.48
+        },
+        {
+          "id": "bar-60",
+          "label": "Bar 28",
+          "start": 317.48,
+          "end": 322.94
+        },
+        {
+          "id": "bar-61",
+          "label": "Bar 29",
+          "start": 322.94,
+          "end": 328.4
+        },
+        {
+          "id": "bar-62",
+          "label": "Bar 30",
+          "start": 328.4,
+          "end": 333.86
+        },
+        {
+          "id": "bar-63",
+          "label": "Bar 31",
+          "start": 333.86,
+          "end": 339.32
+        },
+        {
+          "id": "bar-64",
+          "label": "Bar 32",
+          "start": 339.32,
+          "end": 344.78
+        }
+      ]
+    },
+    {
+      "id": "section-3",
+      "type": "bridge",
+      "label": "Bridge Section (3)",
+      "start": 192,
+      "end": 288,
+      "markers": [
+        {
+          "id": "bar-65",
+          "label": "Bar 1",
+          "start": 344.78,
+          "end": 350.24
+        },
+        {
+          "id": "bar-66",
+          "label": "Bar 2",
+          "start": 350.24,
+          "end": 355.7
+        },
+        {
+          "id": "bar-67",
+          "label": "Bar 3",
+          "start": 355.7,
+          "end": 361.16
+        },
+        {
+          "id": "bar-68",
+          "label": "Bar 4",
+          "start": 361.16,
+          "end": 366.62
+        },
+        {
+          "id": "bar-69",
+          "label": "Bar 5",
+          "start": 366.62,
+          "end": 372.08
+        },
+        {
+          "id": "bar-70",
+          "label": "Bar 6",
+          "start": 372.08,
+          "end": 377.54
+        },
+        {
+          "id": "bar-71",
+          "label": "Bar 7",
+          "start": 377.54,
+          "end": 383
+        },
+        {
+          "id": "bar-72",
+          "label": "Bar 8",
+          "start": 383,
+          "end": 388.46
+        },
+        {
+          "id": "bar-73",
+          "label": "Bar 9",
+          "start": 388.46,
+          "end": 393.92
+        },
+        {
+          "id": "bar-74",
+          "label": "Bar 10",
+          "start": 393.92,
+          "end": 399.38
+        },
+        {
+          "id": "bar-75",
+          "label": "Bar 11",
+          "start": 399.38,
+          "end": 404.84
+        },
+        {
+          "id": "bar-76",
+          "label": "Bar 12",
+          "start": 404.84,
+          "end": 410.3
+        },
+        {
+          "id": "bar-77",
+          "label": "Bar 13",
+          "start": 410.3,
+          "end": 415.76
+        },
+        {
+          "id": "bar-78",
+          "label": "Bar 14",
+          "start": 415.76,
+          "end": 421.22
+        },
+        {
+          "id": "bar-79",
+          "label": "Bar 15",
+          "start": 421.22,
+          "end": 426.68
+        },
+        {
+          "id": "bar-80",
+          "label": "Bar 16",
+          "start": 426.68,
+          "end": 432.14
+        },
+        {
+          "id": "bar-81",
+          "label": "Bar 17",
+          "start": 432.14,
+          "end": 437.6
+        },
+        {
+          "id": "bar-82",
+          "label": "Bar 18",
+          "start": 437.6,
+          "end": 443.06
+        },
+        {
+          "id": "bar-83",
+          "label": "Bar 19",
+          "start": 443.06,
+          "end": 448.52
+        },
+        {
+          "id": "bar-84",
+          "label": "Bar 20",
+          "start": 448.52,
+          "end": 453.98
+        },
+        {
+          "id": "bar-85",
+          "label": "Bar 21",
+          "start": 453.98,
+          "end": 459.44
+        },
+        {
+          "id": "bar-86",
+          "label": "Bar 22",
+          "start": 459.44,
+          "end": 464.9
+        },
+        {
+          "id": "bar-87",
+          "label": "Bar 23",
+          "start": 464.9,
+          "end": 470.36
+        },
+        {
+          "id": "bar-88",
+          "label": "Bar 24",
+          "start": 470.36,
+          "end": 475.82
+        },
+        {
+          "id": "bar-89",
+          "label": "Bar 25",
+          "start": 475.82,
+          "end": 481.28
+        },
+        {
+          "id": "bar-90",
+          "label": "Bar 26",
+          "start": 481.28,
+          "end": 486.74
+        },
+        {
+          "id": "bar-91",
+          "label": "Bar 27",
+          "start": 486.74,
+          "end": 492.2
+        },
+        {
+          "id": "bar-92",
+          "label": "Bar 28",
+          "start": 492.2,
+          "end": 497.66
+        },
+        {
+          "id": "bar-93",
+          "label": "Bar 29",
+          "start": 497.66,
+          "end": 503.12
+        },
+        {
+          "id": "bar-94",
+          "label": "Bar 30",
+          "start": 503.12,
+          "end": 508.58
+        },
+        {
+          "id": "bar-95",
+          "label": "Bar 31",
+          "start": 508.58,
+          "end": 514.04
+        },
+        {
+          "id": "bar-96",
+          "label": "Bar 32",
+          "start": 514.04,
+          "end": 519.5
+        }
+      ]
+    }
+  ]
+}

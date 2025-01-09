@@ -66,8 +66,8 @@ export default function PlaybackGrid({ onPlaySnippet }) {
             sx={{ height: 8, borderRadius: 4 }}
           />
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Playing snippet from {activeStart.toFixed(1)}s to{" "}
-            {(activeStart + 4.5).toFixed(1)}s
+            Playing snippet from {activeStart.toFixed(2)}s to{" "}
+            {(activeStart + 4.5).toFixed(2)}s
           </Typography>
         </Box>
       )}

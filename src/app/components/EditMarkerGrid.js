@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//src/app/components/EditMarkerGrid2.js
+//src/app/components/EditMarkerGrid.js
 //------------------------------------------------------------------------------
 
 "use client";
@@ -11,7 +11,7 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-export default function EditMarkerGrid2({
+export default function EditMarkerGrid({
   sections,
   onAdjustBarTime,
   onPlayBar,
@@ -43,7 +43,7 @@ export default function EditMarkerGrid2({
       {sections.map((section) => (
         <Box key={section.id} sx={{ mb: 3 }}>
           <Divider sx={{ my: 1 }} />
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
             {section.label} ({section.type})
           </Typography>
 
@@ -61,7 +61,7 @@ export default function EditMarkerGrid2({
                       p: 0.5,
                       display: "flex",
                       flexDirection: "column",
-                      gap: 0.5,
+                      gap: 0.2,
                     }}
                   >
                     {/* ROW 1: Bar label (click) and Shift icons (right) */}
@@ -75,14 +75,14 @@ export default function EditMarkerGrid2({
                       <Typography
                         variant="body2"
                         sx={{
-                          fontWeight: "bold",
+                          fontWeight: "normal",
                           cursor: "pointer",
                           textDecoration: "underline",
                           mr: 1,
                         }}
                         onClick={() => handlePlay(bar, nextBar)}
                       >
-                        {bar.label}
+                        {bar.label} &gt; ({bar.id})
                       </Typography>
 
                       {bar.id !== "bar-1" && (
@@ -107,11 +107,11 @@ export default function EditMarkerGrid2({
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      <Typography variant="body2" sx={{}}>
                         {bar.start.toFixed(2)}s
                       </Typography>
                       <KeyboardArrowRightIcon fontSize="small" />
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      <Typography variant="body2" sx={{  }}>
                         {bar.end.toFixed(2)}s
                       </Typography>
                       <Typography
@@ -132,7 +132,7 @@ export default function EditMarkerGrid2({
   );
 }
 
-EditMarkerGrid2.propTypes = {
+EditMarkerGrid.propTypes = {
   sections: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

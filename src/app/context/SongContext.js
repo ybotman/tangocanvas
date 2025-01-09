@@ -53,7 +53,7 @@ export function SongProvider({ children }) {
       waveSurferRef.current.on("seek", (progress) => {
         const duration = waveSurferRef.current.getDuration();
         const clickedSec = duration * progress;
-        const secTenths = parseFloat(clickedSec.toFixed(1));
+        const secTenths = parseFloat(clickedSec.toFixed(2));
         setLastClickTime(secTenths);
       });
     }
