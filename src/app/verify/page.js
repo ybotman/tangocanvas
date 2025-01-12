@@ -8,7 +8,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
 import { useSongContext } from "@/context/SongContext";
-import MarkerGrid from "@/components/MarkerGrid";
+import PlaybackGrid from "@/components/PlaybackGrid";
 
 /**
  * The Verify page uses SongContext's single wave, loaded into #waveform.
@@ -72,7 +72,9 @@ export default function VerifyPage() {
         // Fetch marker JSON
         const resp = await fetch(markerUrl);
         if (!resp.ok) {
-          throw new Error(`Failed to load marker JSON at ${markerUrl} (${resp.status})`);
+          throw new Error(
+            `Failed to load marker JSON at ${markerUrl} (${resp.status})`,
+          );
         }
         const data = await resp.json();
         data.audioUrl = audioUrl;
@@ -192,7 +194,7 @@ export default function VerifyPage() {
         }}
       />
 
-      <MarkerGrid
+      <PlaybackGrid
         sections={markerData.sections || []}
         onPlayBar={handlePlayBar}
       />

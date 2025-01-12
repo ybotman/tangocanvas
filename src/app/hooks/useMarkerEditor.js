@@ -30,7 +30,6 @@ export default function useMarkerEditor(songData) {
     }
   }, [songData]);
 
-
   /**
    * adjustBarTime(barId, delta):
    *  1) If barId === "bar-1", do nothing.

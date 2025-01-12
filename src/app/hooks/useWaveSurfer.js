@@ -1,132 +1,294 @@
-//src/app/hooks/useWaveSurfer.js
+/**
+ * src/app/hooks/useWaveSurfer.js
+ *
+ * Production-ready local-wave approach for the PlayPage.
+ * In your steps:
+ *   - onInit => initWaveSurfer => loadSong => snippet, etc.
+ */
 
 "use client";
 
 import { useRef, useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import WaveSurfer from "wavesurfer.js";
+import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.js";
+import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.js";
 
-/**
- * Updated: manually pause after snippetDuration so it truly stops.
- */
-export default function useWaveSurfer({ containerRef }) {
+export default function useWaveSurfer({
+  containerRef,
+  timelineRef = null,
+  enableClickableWaveform = true,
+}) {
+  console.log("entering useWaveSurfer with containerRef=", containerRef);
+
   const waveSurferRef = useRef(null);
-  const [isReady, setIsReady] = useState(false);
+
+  // Stores snippet request if wave not ready yet
+  const snippetRequestRef = useRef(null);
+
+  // snippet auto-stop timer
   const snippetTimeoutRef = useRef(null);
 
-  // 1) Initialize
-  const initWaveSurfer = useCallback(() => {
-    if (waveSurferRef.current || !containerRef.current) return;
+  // local states
+  const [isReady, setIsReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-    waveSurferRef.current = WaveSurfer.create({
-      container: containerRef.current,
-      waveColor: "#999",
-      progressColor: "#f50057",
-      pixelRatio: 2,
-      barWidth: 0, // or remove barWidth to let WaveSurfer draw a continuous wave
-      minPxPerSec: 50, // or higher
-      scrollParent: true, // if you have enough horizontal space
-      height: 100,
-      responsive: true,
-      backend: "WebAudio",
-    });
-
-    waveSurferRef.current.on("ready", () => setIsReady(true));
-    waveSurferRef.current.on("error", (err) => {
-      console.error("WaveSurfer error:", err);
-    });
-  }, [containerRef]);
-
-  // 2) Load a track
-  const loadSong = useCallback((url) => {
-    if (!waveSurferRef.current) return;
-    setIsReady(false);
-    waveSurferRef.current.load(url);
-  }, []);
-
-  // 3) Play a snippet manually and then pause
+  /**
+   * playSnippet:
+   *  - If wave not ready => queue the snippet request (so we don't skip).
+   *  - Otherwise, plays the snippet from `startSec` for `snippetDuration`.
+   */
   const playSnippet = useCallback(
     (startSec, snippetDuration = 4.5) => {
-      if (!waveSurferRef.current || !isReady) return;
+      console.log(
+        "useWaveSurfer => entering playSnippet with",
+        startSec,
+        snippetDuration,
+        isReady
+      );
 
-      // Clear any previous timeout
+      if (!waveSurferRef.current) {
+        console.warn("useWaveSurfer => no wave => skip snippet");
+        return;
+      }
+
+      // If wave is not yet loaded, queue the snippet
+      if (!isReady) {
+        console.warn("useWaveSurfer => wave not ready => queue snippet request");
+        snippetRequestRef.current = {
+          startSec,
+          snippetLen: snippetDuration,
+        };
+        return;
+      }
+
+      // Clear old snippet timer
       if (snippetTimeoutRef.current) {
         clearTimeout(snippetTimeoutRef.current);
         snippetTimeoutRef.current = null;
       }
 
       const ws = waveSurferRef.current;
-      ws.setVolume(1.0);
+      const dur = ws.getDuration();
+      if (!dur) {
+        console.warn("useWaveSurfer => wave duration=0 => skip snippet");
+        return;
+      }
+      if (startSec >= dur) {
+        console.warn("useWaveSurfer => startSec >= wave dur => skip snippet");
+        return;
+      }
 
-      // Ensure we're not out of bounds
-      const totalDur = ws.getDuration();
-      if (startSec >= totalDur) return;
+      let finalSnippet = snippetDuration;
+      if (startSec + finalSnippet > dur) {
+        finalSnippet = dur - startSec;
+      }
 
-      // Seek & play
-      ws.pause();
-      ws.seekTo(startSec / totalDur);
+      // Highlight region
+  //    ws.clearRegions();
+  //    ws.addRegion({
+  //      start: startSec,
+  //      end: startSec + finalSnippet,
+  //      color: "rgba(255, 0, 0, 0.15)",
+   //   });
+
+      // Stop, then play
+      ws.stop();
+      ws.seekTo(startSec / dur);
       ws.play();
+      console.log(
+        `useWaveSurfer => snippet start @ ${startSec} for ${finalSnippet}`,
+      );
 
-      // Manually pause after snippetDuration
       snippetTimeoutRef.current = setTimeout(() => {
         if (waveSurferRef.current) {
-          waveSurferRef.current.pause();
+          waveSurferRef.current.stop();
+          console.log("useWaveSurfer => snippet ended after timer");
         }
-      }, snippetDuration * 1000);
+      }, finalSnippet * 1000);
     },
     [isReady],
   );
 
-  // 4) Zoom to highlight bar in context
-  const zoomToBar = useCallback(
-    (startSec, totalDuration, barsToShow = 3) => {
-      if (!waveSurferRef.current || !isReady) return;
+  /**
+   * initWaveSurfer:
+   *  - Creates the WaveSurfer instance if not yet created.
+   *  - Sets up event handlers, including an "on('ready')" that checks snippetRequestRef.
+   */
+  const initWaveSurfer = useCallback(() => {
+    console.log(
+      "useWaveSurfer => initWaveSurfer() called with waveSurferRef.current:",
+      waveSurferRef.current,
+    );
+    if (waveSurferRef.current) {
+      console.warn("useWaveSurfer => waveSurfer already created => skipping");
+      return;
+    }
+    if (!containerRef.current) {
+      console.warn("useWaveSurfer => containerRef is null => skip init");
+      return;
+    }
 
-      // each bar ~3s => 3 bars => ~9s wide
-      const widthSec = barsToShow * 3;
-      const PPS = 30;
-      waveSurferRef.current.zoom(PPS);
+    waveSurferRef.current = WaveSurfer.create({
+      container: containerRef.current,
+      waveColor: "#999",
+      progressColor: "#f50057",
+      cursorColor: "#333",
+      height: 100,
+      responsive: true,
+      backend: "WebAudio",
+      plugins: [
+        timelineRef
+          ? TimelinePlugin.create({
+              container: timelineRef,
+              primaryColor: "#666",
+              primaryFontColor: "#666",
+              height: 20,
+            })
+          : null,
+        RegionsPlugin.create({}),
+      ].filter(Boolean),
+    });
 
-      // Center startSec in the 9s window
-      const halfSpan = widthSec / 2;
-      let centerTime = startSec + halfSpan;
-      if (centerTime > totalDuration) centerTime = totalDuration;
+    waveSurferRef.current.on("ready", () => {
+      console.log("useWaveSurfer => on('ready') event");
+      setIsReady(true);
 
-      const ratio = centerTime / totalDuration;
-      waveSurferRef.current.seekTo(Math.min(ratio, 1));
-    },
-    [isReady],
-  );
+      // If we previously queued a snippet, play it immediately now
+      if (snippetRequestRef.current) {
+        const { startSec, snippetLen } = snippetRequestRef.current;
+        snippetRequestRef.current = null;
+        console.log(
+          "useWaveSurfer => wave is now ready => playing queued snippet",
+          startSec,
+          snippetLen,
+        );
+        playSnippet(startSec, snippetLen);
+      }
+    });
 
-  // 5) Cleanup
+    waveSurferRef.current.on("error", (err) => {
+      console.error("useWaveSurfer => wave error:", err);
+    });
+
+    waveSurferRef.current.on("play", () => {
+      setIsPlaying(true);
+      console.log("useWaveSurfer => wave playing");
+    });
+    waveSurferRef.current.on("pause", () => {
+      setIsPlaying(false);
+      console.log("useWaveSurfer => wave paused");
+    });
+    waveSurferRef.current.on("finish", () => {
+      setIsPlaying(false);
+      console.log("useWaveSurfer => wave finished");
+    });
+
+    if (enableClickableWaveform) {
+      waveSurferRef.current.on("seek", () => {
+        const clickTime = waveSurferRef.current.getCurrentTime();
+        console.log("useWaveSurfer => waveform clicked => time", clickTime);
+        // By calling playSnippet directly, if isReady is false, it will queue it.
+        playSnippet(clickTime, 5);
+      });
+    }
+
+    console.log("useWaveSurfer => waveSurfer instance created OK.");
+  }, [containerRef, timelineRef, enableClickableWaveform, playSnippet]);
+
+  /**
+   * loadSong:
+   *  - Resets isReady to false, calls waveSurfer.load(url).
+   *  - The "on('ready')" callback will set isReady = true.
+   */
+  const loadSong = useCallback((url) => {
+    console.log("useWaveSurfer => loadSong with url:", url);
+    if (!waveSurferRef.current) {
+      console.warn("useWaveSurfer => wave not inited => skipping load");
+      return;
+    }
+    setIsReady(false);
+    waveSurferRef.current.load(url);
+  }, []);
+
+  /**
+   * loadSongAndSnippet:
+   *  - Also sets isReady=false, queues snippet in snippetRequestRef, then loads the wave.
+   */
+  const loadSongAndSnippet = useCallback((url, startSec, snippetLen) => {
+    console.log(
+      "useWaveSurfer => loadSongAndSnippet => requesting snippet",
+      startSec,
+      snippetLen,
+    );
+    if (!waveSurferRef.current) {
+      console.warn(
+        "useWaveSurfer => wave not inited => skip loadSongAndSnippet",
+      );
+      return;
+    }
+    setIsReady(false);
+
+    // Store snippet request
+    snippetRequestRef.current = { startSec, snippetLen };
+    waveSurferRef.current.load(url);
+  }, []);
+
+  /**
+   * stopAudio:
+   *  - Manual stop
+   */
+  const stopAudio = useCallback(() => {
+    console.log("useWaveSurfer => stopAudio called");
+    if (waveSurferRef.current) {
+      waveSurferRef.current.stop();
+      console.log("useWaveSurfer => wave stopped by user");
+    }
+  }, []);
+
+  /**
+   * cleanupWaveSurfer:
+   *  - Destroy wave instance & reset states.
+   */
   const cleanupWaveSurfer = useCallback(() => {
+    console.log("useWaveSurfer => cleanupWaveSurfer called");
     if (snippetTimeoutRef.current) {
       clearTimeout(snippetTimeoutRef.current);
       snippetTimeoutRef.current = null;
     }
+    snippetRequestRef.current = null;
+
     if (waveSurferRef.current) {
       try {
-        waveRef.current?.destroy();
+        waveSurferRef.current.destroy();
+        console.log("useWaveSurfer => wave destroyed");
       } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("Destroy error:", err);
-        }
+        console.error("useWaveSurfer => destroy error:", err);
       }
       waveSurferRef.current = null;
     }
     setIsReady(false);
+    setIsPlaying(false);
   }, []);
 
   return {
+    isReady,
+    isPlaying,
     initWaveSurfer,
     loadSong,
+    loadSongAndSnippet,
     playSnippet,
-    zoomToBar,
+    stopAudio,
     cleanupWaveSurfer,
-    isReady,
   };
 }
 
 useWaveSurfer.propTypes = {
-  containerRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  containerRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+    .isRequired,
+  timelineRef: PropTypes.oneOfType([
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+    PropTypes.oneOf([null]),
+  ]),
+  enableClickableWaveform: PropTypes.bool,
 };

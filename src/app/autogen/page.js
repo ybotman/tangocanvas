@@ -20,7 +20,7 @@ export default function AutoGenPage() {
     selectedSong,
     loadSong,
     snippetPlayback,
-    lastClickTime,    // wave Surfer on("seek",...) updates this
+    lastClickTime, // wave Surfer on("seek",...) updates this
     setLastClickTime, // if you want to manually reset
     cleanupWaveSurfer,
     error: contextError,
@@ -29,7 +29,7 @@ export default function AutoGenPage() {
   const [songError, setSongError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // The total wave duration from context or we do a separate approach. 
+  // The total wave duration from context or we do a separate approach.
   // But let's store a local "duration" if needed, or we can do snippet approach from context
   const [duration] = useState(180); // or fetch from markers
 
@@ -46,7 +46,9 @@ export default function AutoGenPage() {
 
   useEffect(() => {
     if (!selectedSong) {
-      setSongError("No song selected. Please return to the main page and select a song.");
+      setSongError(
+        "No song selected. Please return to the main page and select a song.",
+      );
       setLoading(false);
       return;
     }
@@ -97,7 +99,12 @@ export default function AutoGenPage() {
       return;
     }
     const baseName = selectedSong.filename.replace(/\.\w+$/, "");
-    const finalJson = buildSongJson(baseName, section1Time, section2Time, duration);
+    const finalJson = buildSongJson(
+      baseName,
+      section1Time,
+      section2Time,
+      duration,
+    );
     try {
       const resp = await fetch("/api/markers", {
         method: "POST",

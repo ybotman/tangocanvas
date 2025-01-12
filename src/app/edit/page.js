@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { useSongContext } from "@/context/SongContext";
 import useMarkerEditor from "@/hooks/useMarkerEditor";
 import { downloadJSONFile } from "@/utils/jsonHandler";
-import EditMarkerGrid from "@/components/EditMarkerGrid";
+import EditPlaybackGrid from "@/components/EditPlaybackGrid";
 
 import styles from "./EditPage.module.css";
 
@@ -120,9 +120,12 @@ export default function EditPage() {
    * snippet or bar playback. If you want double-click on the wave => do in context.
    * This is just for the bar playback in the UI.
    */
-  const handlePlayBar = useCallback((startSec, endSec) => {
-    snippetPlayback(startSec, endSec - startSec);
-  }, [snippetPlayback]);
+  const handlePlayBar = useCallback(
+    (startSec, endSec) => {
+      snippetPlayback(startSec, endSec - startSec);
+    },
+    [snippetPlayback],
+  );
 
   /**
    * Save Markers => PUT /api/markers
@@ -256,7 +259,7 @@ export default function EditPage() {
 
       {/* SCROLLABLE BARS */}
       <div className={styles.barsScroll}>
-        <EditMarkerGrid
+        <EditPlaybackGrid
           sections={sections}
           onAdjustBarTime={adjustBarTime}
           onPlayBar={(start, end) => handlePlayBar(start, end)}

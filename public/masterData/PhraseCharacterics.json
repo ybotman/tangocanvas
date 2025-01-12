@@ -1,0 +1,41 @@
+{
+  "characteristics": {
+    "emotional": [
+      "Dramatic",
+      "Romantic",
+      "Melancholic",
+      "Joyful",
+      "Playful",
+      "Bittersweet",
+      "Hopeful",
+      "Nostalgic",
+      "Sensual",
+      "Tragic"
+    ],
+    "stylistic": [
+      "Flowery",
+      "Staccato",
+      "Legato",
+      "Elegant",
+      "Pensive",
+      "Lyrical",
+      "Majestic",
+      "Tender",
+      "Dynamic",
+      "Resolute"
+    ],
+    "mood": [
+      "Happy",
+      "Sad",
+      "Passionate",
+      "Dramatic",
+      "Mysterious",
+      "Tense",
+      "Fiery",
+      "Yearning",
+      "Intense",
+      "Whimsical"
+    ],
+    "rhythmic": ["Rhythmic", "Syncopated", "Driving", "Hypnotic", "Swinging"]
+  }
+}

@@ -1,247 +1,144 @@
-/* --------------------------------------------
- * src/app/context/SongContext.js
- * --------------------------------------------
- */
+// src/app/context/SongContext.js
 
 "use client";
 
-import React, { createContext, useContext, useRef, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import WaveSurfer from "wavesurfer.js";
+import { assembleNestedJSON, disassembleFlatJSON } from "@/utils/jsonHandler";
 
-/**
- * SongContext:
- *  - Manages a single WaveSurfer instance for the entire app
- *  - Tracks songs, selectedSong, and isPlaying
- *  - Provides snippet playback, capture of wave clicks, etc.
- */
 const SongContext = createContext();
 
+/**
+ * SongProvider:
+ *  - fetches all .mp3/.wav from /api/songs
+ *  - for each, does GET /api/markers? so each has a basic marker file
+ *  - stores them in `songs`
+ *  - tracks `selectedSong`, letting pages set or read that
+ *  - provides readMarkerData / saveMarkerData for pages that want to manipulate sections/bars
+ */
 export function SongProvider({ children }) {
   const [songs, setSongs] = useState([]);
   const [selectedSong, setSelectedSong] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // For capturing wave clicks / double clicks, used by pages like AutoGen
-  const [lastClickTime, setLastClickTime] = useState(0);
-
-  const waveSurferRef = useRef(null);
-
   /**
-   * 1) Create or re-use WaveSurfer instance in the container: "#waveform"
-   */
-  const initWaveSurfer = () => {
-    if (!waveSurferRef.current) {
-      waveSurferRef.current = WaveSurfer.create({
-        container: "#waveform",
-        waveColor: "#999",
-        progressColor: "#f50057",
-        cursorColor: "#333",
-        height: 100,
-        responsive: true,
-        backend: "WebAudio",
-      });
-
-      // Playback state
-      waveSurferRef.current.on("play", () => setIsPlaying(true));
-      waveSurferRef.current.on("pause", () => setIsPlaying(false));
-      waveSurferRef.current.on("finish", () => setIsPlaying(false));
-
-      // Optional: capture "seek" event to detect user clicks or scrubs
-      waveSurferRef.current.on("seek", (progress) => {
-        const duration = waveSurferRef.current.getDuration();
-        const clickedSec = duration * progress;
-        const secTenths = parseFloat(clickedSec.toFixed(2));
-        setLastClickTime(secTenths);
-      });
-    }
-  };
-
-  /**
-   * 2) Load an audio file into WaveSurfer
-   */
-  const loadSong = (url) => {
-    if (!waveSurferRef.current) initWaveSurfer();
-    waveSurferRef.current.load(url);
-  };
-
-  /**
-   * 3) Toggle Play/Pause
-   */
-  const togglePlay = () => {
-    if (!waveSurferRef.current) return;
-    waveSurferRef.current.playPause();
-  };
-
-  /**
-   * 4) Stop Playback
-   */
-  const stopAudio = () => {
-    if (waveSurferRef.current) {
-      waveSurferRef.current.stop();
-    }
-  };
-
-  /**
-   * 5) snippetPlayback => play from startSec..(startSec + snippetLen)
-   */
-  const snippetPlayback = (startSec, snippetLen = 4.5) => {
-    if (!waveSurferRef.current) return;
-    const ws = waveSurferRef.current;
-    const totalDur = ws.getDuration();
-    if (!totalDur || startSec >= totalDur) return;
-
-    ws.stop(); // ensure a clean start
-    ws.seekTo(startSec / totalDur);
-    ws.play();
-
-    setTimeout(() => {
-      ws.stop();
-    }, snippetLen * 1000);
-  };
-
-  /**
-   * 6) Cleanup WaveSurfer
-   */
-  const cleanupWaveSurfer = () => {
-    if (waveSurferRef.current) {
-      waveSurferRef.current.destroy();
-      waveSurferRef.current = null;
-      setIsPlaying(false);
-    }
-  };
-
-  /**
-   * 7) Fetch & process the songs + marker logic
+   * 1) Fetch audio files => auto-create markers => store results
    */
   useEffect(() => {
-    async function fetchSongsData() {
+    (async () => {
       try {
-        // 1) Load approved filenames
-        const approvedResp = await fetch("/songs/approvedSongs.json");
-        if (!approvedResp.ok) {
-          throw new Error(`Failed to load approvedSongs.json: ${approvedResp.status}`);
+        const resp = await fetch("/api/songs");
+        if (!resp.ok) {
+          throw new Error(`Failed /api/songs => ${resp.status}`);
         }
-        const approvedData = await approvedResp.json();
-        const approvedFilenames = approvedData.songs.map((s) => s.filename);
+        const data = await resp.json();
+        const audioFiles = data.songs || [];
 
-        // 2) Load all audio files from /api/songs
-        const allResp = await fetch("/api/songs");
-        if (!allResp.ok) {
-          throw new Error(`Failed to load audio files: ${allResp.status}`);
+        const results = [];
+        for (const fileObj of audioFiles) {
+          const filename = fileObj.filename;
+          const baseName = filename.replace(/\.\w+$/, "");
+
+          // GET /api/markers? => auto-creates markers if missing
+          const markerResp = await fetch(
+            `/api/markers?songId=${encodeURIComponent(baseName)}`,
+          );
+          if (!markerResp.ok) {
+            console.warn(
+              `Markers fetch for ${baseName} => status ${markerResp.status}`,
+            );
+            continue;
+          }
+
+          const markerJson = await markerResp.json();
+          results.push(markerJson);
         }
-        const allData = await allResp.json();
-
-        // 3) Derive each song's state
-        const processedSongs = await Promise.all(
-          allData.songs.map(async (song) => {
-            const { filename } = song;
-            if (approvedFilenames.includes(filename)) {
-              return { filename, state: "Approved" };
-            }
-            // Check marker file
-            const baseName = filename.replace(/\.\w+$/, "");
-            try {
-              const headResp = await fetch(`/markers/${baseName}-markers.json`, {
-                method: "HEAD",
-              });
-              if (headResp.ok) {
-                return { filename, state: "Matched" };
-              }
-              if (headResp.status === 404) {
-                const created = await createEmptyMarkerFile(baseName);
-                return created
-                  ? { filename, state: "Matched" }
-                  : { filename, state: "NoJson" };
-              }
-              return { filename, state: "Unmatched" };
-            } catch {
-              return { filename, state: "Unmatched" };
-            }
-          })
-        );
-
-        setSongs(processedSongs);
+        setSongs(results);
       } catch (err) {
-        console.error("SongContext Error:", err);
+        console.error("SongContext =>", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
-    }
-
-    fetchSongsData();
+    })();
   }, []);
 
   /**
-   * Create a minimal <songId>-markers.json if missing
-   */
-  async function createEmptyMarkerFile(songId) {
-    const defaultJson = {
-      songId,
-      title: songId,
-      duration: 0,
-      sections: [],
-    };
-
-    try {
-      const resp = await fetch("/api/markers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(defaultJson),
-      });
-      if (!resp.ok) {
-        const result = await resp.json().catch(() => ({}));
-        console.warn("Failed to create empty marker file:", result.error);
-        return false;
-      }
-      return true;
-    } catch (err) {
-      console.error("Error creating marker file:", err);
-      return false;
-    }
-  }
-
-  /**
-   * 8) localStorage sync for selectedSong
+   * 2) Attempt localStorage restore
    */
   useEffect(() => {
-    if (selectedSong?.filename) {
-      localStorage.setItem("lastSelectedSong", selectedSong.filename);
+    const lastSel = localStorage.getItem("lastSelectedSongId");
+    if (lastSel) {
+      setSelectedSong({ songInfo: { songID: lastSel } });
     }
-  }, [selectedSong]);
+  }, []);
 
   /**
-   * 9) If we had a "Loading" state for a leftover selection, we fix it after loading
+   * 3) If we have partial `selectedSong`, refine it once `songs` is loaded
    */
   useEffect(() => {
-    if (!loading && selectedSong?.state === "Loading") {
-      const found = songs.find((s) => s.filename === selectedSong.filename);
+    if (!loading && selectedSong?.songInfo?.songID) {
+      const found = songs.find(
+        (s) => s.songInfo?.songID === selectedSong.songInfo.songID,
+      );
       if (found) {
         setSelectedSong(found);
-      } else {
-        setSelectedSong(null);
       }
     }
   }, [loading, selectedSong, songs]);
 
-  // Provide everything
+  // Keep localStorage in sync
+  useEffect(() => {
+    if (selectedSong?.songInfo?.songID) {
+      localStorage.setItem("lastSelectedSongId", selectedSong.songInfo.songID);
+    }
+  }, [selectedSong]);
+
+  /**
+   * 4) readMarkerData / saveMarkerData if needed
+   */
+  async function readMarkerData(songId) {
+    const url = `/api/markers?songId=${encodeURIComponent(songId)}`;
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`Failed GET /api/markers => ${resp.status}`);
+    }
+    const flatData = await resp.json();
+    console.log("SongContext => readMarkerData => flat:", flatData);
+
+    const nested = await assembleNestedJSON(flatData);
+    console.log("SongContext => readMarkerData => nested:", nested);
+    return nested;
+  }
+
+  async function saveMarkerData(nestedJson) {
+    // disassemble => PUT
+    const flatData = await disassembleFlatJSON(nestedJson);
+    const sid = nestedJson.songInfo?.songID || "Unknown";
+    flatData.songId = sid;
+
+    const resp = await fetch("/api/markers", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(flatData),
+    });
+    if (!resp.ok) {
+      const out = await resp.json().catch(() => ({}));
+      throw new Error(out.error || "PUT /api/markers failed");
+    }
+    console.log("SongContext => saveMarkerData => success.");
+  }
+
   const value = {
     songs,
+    loading,
+    error,
     selectedSong,
     setSelectedSong,
-    isPlaying,
-    loadSong,
-    togglePlay,
-    stopAudio,
-    snippetPlayback,
-    cleanupWaveSurfer,
-    lastClickTime, // for pages like AutoGen to read if needed
-    setLastClickTime,
-    error,
-    loading,
+    // optionally expose these if pages want them:
+    readMarkerData,
+    saveMarkerData,
   };
 
   return <SongContext.Provider value={value}>{children}</SongContext.Provider>;

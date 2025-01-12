@@ -1,0 +1,938 @@
+{
+  "songInfo": {
+    "songID": "La_Cumparsita",
+    "fileName:": "UNK",
+    "orchestra": "UNK",
+    "songPathFile": "/songs/La_Cumparsita.mp3",
+    "jsonPathFile": "/markers/La_Cumparsita-markers.json",
+    "songDuration": 0,
+    "state": ["matched"]
+  },
+  "sections": [
+    {
+      "id": 1,
+      "type": "section",
+      "name": "Section 1",
+      "startTime": 0,
+      "endTime": 67.2,
+      "startBarId": "1",
+      "endBarId": "32"
+    },
+    {
+      "id": 2,
+      "type": "section",
+      "name": "Section 2",
+      "startTime": 67.2,
+      "endTime": 134.4,
+      "startBarId": "33",
+      "endBarId": "64"
+    },
+    {
+      "id": 3,
+      "type": "section",
+      "name": "Section 3",
+      "startTime": 134.4,
+      "endTime": 201.6,
+      "startBarId": "65",
+      "endBarId": "96"
+    }
+  ],
+  "bars": [
+    {
+      "id": "1",
+      "label": "Bar 1",
+      "start": 0,
+      "end": 2.1
+    },
+    {
+      "id": "2",
+      "label": "Bar 2",
+      "start": 2.1,
+      "end": 4.2
+    },
+    {
+      "id": "3",
+      "label": "Bar 3",
+      "start": 4.2,
+      "end": 6.3
+    },
+    {
+      "id": "4",
+      "label": "Bar 4",
+      "start": 6.3,
+      "end": 8.4
+    },
+    {
+      "id": "5",
+      "label": "Bar 5",
+      "start": 8.4,
+      "end": 10.5
+    },
+    {
+      "id": "6",
+      "label": "Bar 6",
+      "start": 10.5,
+      "end": 12.6
+    },
+    {
+      "id": "7",
+      "label": "Bar 7",
+      "start": 12.6,
+      "end": 14.7
+    },
+    {
+      "id": "8",
+      "label": "Bar 8",
+      "start": 14.7,
+      "end": 16.8
+    },
+    {
+      "id": "9",
+      "label": "Bar 9",
+      "start": 16.8,
+      "end": 18.9
+    },
+    {
+      "id": "10",
+      "label": "Bar 10",
+      "start": 18.9,
+      "end": 21
+    },
+    {
+      "id": "11",
+      "label": "Bar 11",
+      "start": 21,
+      "end": 23.1
+    },
+    {
+      "id": "12",
+      "label": "Bar 12",
+      "start": 23.1,
+      "end": 25.2
+    },
+    {
+      "id": "13",
+      "label": "Bar 13",
+      "start": 25.2,
+      "end": 27.3
+    },
+    {
+      "id": "14",
+      "label": "Bar 14",
+      "start": 27.3,
+      "end": 29.4
+    },
+    {
+      "id": "15",
+      "label": "Bar 15",
+      "start": 29.4,
+      "end": 31.5
+    },
+    {
+      "id": "16",
+      "label": "Bar 16",
+      "start": 31.5,
+      "end": 33.6
+    },
+    {
+      "id": "17",
+      "label": "Bar 17",
+      "start": 33.6,
+      "end": 35.7
+    },
+    {
+      "id": "18",
+      "label": "Bar 18",
+      "start": 35.7,
+      "end": 37.8
+    },
+    {
+      "id": "19",
+      "label": "Bar 19",
+      "start": 37.8,
+      "end": 39.9
+    },
+    {
+      "id": "20",
+      "label": "Bar 20",
+      "start": 39.9,
+      "end": 42
+    },
+    {
+      "id": "21",
+      "label": "Bar 21",
+      "start": 42,
+      "end": 44.1
+    },
+    {
+      "id": "22",
+      "label": "Bar 22",
+      "start": 44.1,
+      "end": 46.2
+    },
+    {
+      "id": "23",
+      "label": "Bar 23",
+      "start": 46.2,
+      "end": 48.3
+    },
+    {
+      "id": "24",
+      "label": "Bar 24",
+      "start": 48.3,
+      "end": 50.4
+    },
+    {
+      "id": "25",
+      "label": "Bar 25",
+      "start": 50.4,
+      "end": 52.5
+    },
+    {
+      "id": "26",
+      "label": "Bar 26",
+      "start": 52.5,
+      "end": 54.6
+    },
+    {
+      "id": "27",
+      "label": "Bar 27",
+      "start": 54.6,
+      "end": 56.7
+    },
+    {
+      "id": "28",
+      "label": "Bar 28",
+      "start": 56.7,
+      "end": 58.8
+    },
+    {
+      "id": "29",
+      "label": "Bar 29",
+      "start": 58.8,
+      "end": 60.9
+    },
+    {
+      "id": "30",
+      "label": "Bar 30",
+      "start": 60.9,
+      "end": 63
+    },
+    {
+      "id": "31",
+      "label": "Bar 31",
+      "start": 63,
+      "end": 65.1
+    },
+    {
+      "id": "32",
+      "label": "Bar 32",
+      "start": 65.1,
+      "end": 67.2
+    },
+    {
+      "id": "33",
+      "label": "Bar 33",
+      "start": 67.2,
+      "end": 69.3
+    },
+    {
+      "id": "34",
+      "label": "Bar 34",
+      "start": 69.3,
+      "end": 71.4
+    },
+    {
+      "id": "35",
+      "label": "Bar 35",
+      "start": 71.4,
+      "end": 73.5
+    },
+    {
+      "id": "36",
+      "label": "Bar 36",
+      "start": 73.5,
+      "end": 75.6
+    },
+    {
+      "id": "37",
+      "label": "Bar 37",
+      "start": 75.6,
+      "end": 77.7
+    },
+    {
+      "id": "38",
+      "label": "Bar 38",
+      "start": 77.7,
+      "end": 79.8
+    },
+    {
+      "id": "39",
+      "label": "Bar 39",
+      "start": 79.8,
+      "end": 81.9
+    },
+    {
+      "id": "40",
+      "label": "Bar 40",
+      "start": 81.9,
+      "end": 84
+    },
+    {
+      "id": "41",
+      "label": "Bar 41",
+      "start": 84,
+      "end": 86.1
+    },
+    {
+      "id": "42",
+      "label": "Bar 42",
+      "start": 86.1,
+      "end": 88.2
+    },
+    {
+      "id": "43",
+      "label": "Bar 43",
+      "start": 88.2,
+      "end": 90.3
+    },
+    {
+      "id": "44",
+      "label": "Bar 44",
+      "start": 90.3,
+      "end": 92.4
+    },
+    {
+      "id": "45",
+      "label": "Bar 45",
+      "start": 92.4,
+      "end": 94.5
+    },
+    {
+      "id": "46",
+      "label": "Bar 46",
+      "start": 94.5,
+      "end": 96.6
+    },
+    {
+      "id": "47",
+      "label": "Bar 47",
+      "start": 96.6,
+      "end": 98.7
+    },
+    {
+      "id": "48",
+      "label": "Bar 48",
+      "start": 98.7,
+      "end": 100.8
+    },
+    {
+      "id": "49",
+      "label": "Bar 49",
+      "start": 100.8,
+      "end": 102.9
+    },
+    {
+      "id": "50",
+      "label": "Bar 50",
+      "start": 102.9,
+      "end": 105
+    },
+    {
+      "id": "51",
+      "label": "Bar 51",
+      "start": 105,
+      "end": 107.1
+    },
+    {
+      "id": "52",
+      "label": "Bar 52",
+      "start": 107.1,
+      "end": 109.2
+    },
+    {
+      "id": "53",
+      "label": "Bar 53",
+      "start": 109.2,
+      "end": 111.3
+    },
+    {
+      "id": "54",
+      "label": "Bar 54",
+      "start": 111.3,
+      "end": 113.4
+    },
+    {
+      "id": "55",
+      "label": "Bar 55",
+      "start": 113.4,
+      "end": 115.5
+    },
+    {
+      "id": "56",
+      "label": "Bar 56",
+      "start": 115.5,
+      "end": 117.6
+    },
+    {
+      "id": "57",
+      "label": "Bar 57",
+      "start": 117.6,
+      "end": 119.7
+    },
+    {
+      "id": "58",
+      "label": "Bar 58",
+      "start": 119.7,
+      "end": 121.8
+    },
+    {
+      "id": "59",
+      "label": "Bar 59",
+      "start": 121.8,
+      "end": 123.9
+    },
+    {
+      "id": "60",
+      "label": "Bar 60",
+      "start": 123.9,
+      "end": 126
+    },
+    {
+      "id": "61",
+      "label": "Bar 61",
+      "start": 126,
+      "end": 128.1
+    },
+    {
+      "id": "62",
+      "label": "Bar 62",
+      "start": 128.1,
+      "end": 130.2
+    },
+    {
+      "id": "63",
+      "label": "Bar 63",
+      "start": 130.2,
+      "end": 132.3
+    },
+    {
+      "id": "64",
+      "label": "Bar 64",
+      "start": 132.3,
+      "end": 134.4
+    },
+    {
+      "id": "65",
+      "label": "Bar 65",
+      "start": 134.4,
+      "end": 136.5
+    },
+    {
+      "id": "66",
+      "label": "Bar 66",
+      "start": 136.5,
+      "end": 138.6
+    },
+    {
+      "id": "67",
+      "label": "Bar 67",
+      "start": 138.6,
+      "end": 140.7
+    },
+    {
+      "id": "68",
+      "label": "Bar 68",
+      "start": 140.7,
+      "end": 142.8
+    },
+    {
+      "id": "69",
+      "label": "Bar 69",
+      "start": 142.8,
+      "end": 144.9
+    },
+    {
+      "id": "70",
+      "label": "Bar 70",
+      "start": 144.9,
+      "end": 147
+    },
+    {
+      "id": "71",
+      "label": "Bar 71",
+      "start": 147,
+      "end": 149.1
+    },
+    {
+      "id": "72",
+      "label": "Bar 72",
+      "start": 149.1,
+      "end": 151.2
+    },
+    {
+      "id": "73",
+      "label": "Bar 73",
+      "start": 151.2,
+      "end": 153.3
+    },
+    {
+      "id": "74",
+      "label": "Bar 74",
+      "start": 153.3,
+      "end": 155.4
+    },
+    {
+      "id": "75",
+      "label": "Bar 75",
+      "start": 155.4,
+      "end": 157.5
+    },
+    {
+      "id": "76",
+      "label": "Bar 76",
+      "start": 157.5,
+      "end": 159.6
+    },
+    {
+      "id": "77",
+      "label": "Bar 77",
+      "start": 159.6,
+      "end": 161.7
+    },
+    {
+      "id": "78",
+      "label": "Bar 78",
+      "start": 161.7,
+      "end": 163.8
+    },
+    {
+      "id": "79",
+      "label": "Bar 79",
+      "start": 163.8,
+      "end": 165.9
+    },
+    {
+      "id": "80",
+      "label": "Bar 80",
+      "start": 165.9,
+      "end": 168
+    },
+    {
+      "id": "81",
+      "label": "Bar 81",
+      "start": 168,
+      "end": 170.1
+    },
+    {
+      "id": "82",
+      "label": "Bar 82",
+      "start": 170.1,
+      "end": 172.2
+    },
+    {
+      "id": "83",
+      "label": "Bar 83",
+      "start": 172.2,
+      "end": 174.3
+    },
+    {
+      "id": "84",
+      "label": "Bar 84",
+      "start": 174.3,
+      "end": 176.4
+    },
+    {
+      "id": "85",
+      "label": "Bar 85",
+      "start": 176.4,
+      "end": 178.5
+    },
+    {
+      "id": "86",
+      "label": "Bar 86",
+      "start": 178.5,
+      "end": 180.6
+    },
+    {
+      "id": "87",
+      "label": "Bar 87",
+      "start": 180.6,
+      "end": 182.7
+    },
+    {
+      "id": "88",
+      "label": "Bar 88",
+      "start": 182.7,
+      "end": 184.8
+    },
+    {
+      "id": "89",
+      "label": "Bar 89",
+      "start": 184.8,
+      "end": 186.9
+    },
+    {
+      "id": "90",
+      "label": "Bar 90",
+      "start": 186.9,
+      "end": 189
+    },
+    {
+      "id": "91",
+      "label": "Bar 91",
+      "start": 189,
+      "end": 191.1
+    },
+    {
+      "id": "92",
+      "label": "Bar 92",
+      "start": 191.1,
+      "end": 193.2
+    },
+    {
+      "id": "93",
+      "label": "Bar 93",
+      "start": 193.2,
+      "end": 195.3
+    },
+    {
+      "id": "94",
+      "label": "Bar 94",
+      "start": 195.3,
+      "end": 197.4
+    },
+    {
+      "id": "95",
+      "label": "Bar 95",
+      "start": 197.4,
+      "end": 199.5
+    },
+    {
+      "id": "96",
+      "label": "Bar 96",
+      "start": 199.5,
+      "end": 201.6
+    },
+    {
+      "id": "97",
+      "label": "Bar 97",
+      "start": 201.6,
+      "end": 203.7
+    },
+    {
+      "id": "98",
+      "label": "Bar 98",
+      "start": 203.7,
+      "end": 205.8
+    },
+    {
+      "id": "99",
+      "label": "Bar 99",
+      "start": 205.8,
+      "end": 207.9
+    },
+    {
+      "id": "100",
+      "label": "Bar 100",
+      "start": 207.9,
+      "end": 210
+    },
+    {
+      "id": "101",
+      "label": "Bar 101",
+      "start": 210,
+      "end": 212.1
+    },
+    {
+      "id": "102",
+      "label": "Bar 102",
+      "start": 212.1,
+      "end": 214.2
+    },
+    {
+      "id": "103",
+      "label": "Bar 103",
+      "start": 214.2,
+      "end": 216.3
+    },
+    {
+      "id": "104",
+      "label": "Bar 104",
+      "start": 216.3,
+      "end": 218.4
+    },
+    {
+      "id": "105",
+      "label": "Bar 105",
+      "start": 218.4,
+      "end": 220.5
+    },
+    {
+      "id": "106",
+      "label": "Bar 106",
+      "start": 220.5,
+      "end": 222.6
+    },
+    {
+      "id": "107",
+      "label": "Bar 107",
+      "start": 222.6,
+      "end": 224.7
+    },
+    {
+      "id": "108",
+      "label": "Bar 108",
+      "start": 224.7,
+      "end": 226.8
+    },
+    {
+      "id": "109",
+      "label": "Bar 109",
+      "start": 226.8,
+      "end": 228.9
+    },
+    {
+      "id": "110",
+      "label": "Bar 110",
+      "start": 228.9,
+      "end": 231
+    },
+    {
+      "id": "111",
+      "label": "Bar 111",
+      "start": 231,
+      "end": 233.1
+    },
+    {
+      "id": "112",
+      "label": "Bar 112",
+      "start": 233.1,
+      "end": 235.2
+    },
+    {
+      "id": "113",
+      "label": "Bar 113",
+      "start": 235.2,
+      "end": 237.3
+    },
+    {
+      "id": "114",
+      "label": "Bar 114",
+      "start": 237.3,
+      "end": 239.4
+    },
+    {
+      "id": "115",
+      "label": "Bar 115",
+      "start": 239.4,
+      "end": 241.5
+    },
+    {
+      "id": "116",
+      "label": "Bar 116",
+      "start": 241.5,
+      "end": 243.6
+    },
+    {
+      "id": "117",
+      "label": "Bar 117",
+      "start": 243.6,
+      "end": 245.7
+    },
+    {
+      "id": "118",
+      "label": "Bar 118",
+      "start": 245.7,
+      "end": 247.8
+    },
+    {
+      "id": "119",
+      "label": "Bar 119",
+      "start": 247.8,
+      "end": 249.9
+    },
+    {
+      "id": "120",
+      "label": "Bar 120",
+      "start": 249.9,
+      "end": 252
+    },
+    {
+      "id": "121",
+      "label": "Bar 121",
+      "start": 252,
+      "end": 254.1
+    },
+    {
+      "id": "122",
+      "label": "Bar 122",
+      "start": 254.1,
+      "end": 256.2
+    },
+    {
+      "id": "123",
+      "label": "Bar 123",
+      "start": 256.2,
+      "end": 258.3
+    },
+    {
+      "id": "124",
+      "label": "Bar 124",
+      "start": 258.3,
+      "end": 260.4
+    },
+    {
+      "id": "125",
+      "label": "Bar 125",
+      "start": 260.4,
+      "end": 262.5
+    },
+    {
+      "id": "126",
+      "label": "Bar 126",
+      "start": 262.5,
+      "end": 264.6
+    },
+    {
+      "id": "127",
+      "label": "Bar 127",
+      "start": 264.6,
+      "end": 266.7
+    },
+    {
+      "id": "128",
+      "label": "Bar 128",
+      "start": 266.7,
+      "end": 268.8
+    },
+    {
+      "id": "129",
+      "label": "Bar 129",
+      "start": 268.8,
+      "end": 270.9
+    },
+    {
+      "id": "130",
+      "label": "Bar 130",
+      "start": 270.9,
+      "end": 273
+    },
+    {
+      "id": "131",
+      "label": "Bar 131",
+      "start": 273,
+      "end": 275.1
+    },
+    {
+      "id": "132",
+      "label": "Bar 132",
+      "start": 275.1,
+      "end": 277.2
+    },
+    {
+      "id": "133",
+      "label": "Bar 133",
+      "start": 277.2,
+      "end": 279.3
+    },
+    {
+      "id": "134",
+      "label": "Bar 134",
+      "start": 279.3,
+      "end": 281.4
+    },
+    {
+      "id": "135",
+      "label": "Bar 135",
+      "start": 281.4,
+      "end": 283.5
+    },
+    {
+      "id": "136",
+      "label": "Bar 136",
+      "start": 283.5,
+      "end": 285.6
+    },
+    {
+      "id": "137",
+      "label": "Bar 137",
+      "start": 285.6,
+      "end": 287.7
+    },
+    {
+      "id": "138",
+      "label": "Bar 138",
+      "start": 287.7,
+      "end": 289.8
+    },
+    {
+      "id": "139",
+      "label": "Bar 139",
+      "start": 289.8,
+      "end": 291.9
+    },
+    {
+      "id": "140",
+      "label": "Bar 140",
+      "start": 291.9,
+      "end": 294
+    },
+    {
+      "id": "141",
+      "label": "Bar 141",
+      "start": 294,
+      "end": 296.1
+    },
+    {
+      "id": "142",
+      "label": "Bar 142",
+      "start": 296.1,
+      "end": 298.2
+    },
+    {
+      "id": "143",
+      "label": "Bar 143",
+      "start": 298.2,
+      "end": 300.3
+    },
+    {
+      "id": "144",
+      "label": "Bar 144",
+      "start": 300.3,
+      "end": 302.4
+    },
+    {
+      "id": "145",
+      "label": "Bar 145",
+      "start": 302.4,
+      "end": 304.5
+    },
+    {
+      "id": "146",
+      "label": "Bar 146",
+      "start": 304.5,
+      "end": 306.6
+    }
+  ],
+  "Rhythms": [
+    {
+      "BarId": 16,
+      "rhythmType": "Sync A"
+    },
+    {
+      "BarId": 23,
+      "rhythmType": "Sync A"
+    }
+  ],
+  "chordNotation": [
+    {
+      "BarId": 16,
+      "chordNotation": "I"
+    },
+    {
+      "BarId": 23,
+      "rhythmType": "iv"
+    }
+  ]
+}

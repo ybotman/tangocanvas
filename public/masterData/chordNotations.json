@@ -1,0 +1,20 @@
+{
+  "chordNotations": [
+    "I",
+    "i",
+    "II",
+    "ii",
+    "III",
+    "IV",
+    "iv",
+    "V",
+    "v",
+    "VI",
+    "vi",
+    "VII",
+    "vii"
+  ],
+  "chordModifications": ["Maj7", "Min7", "6th", "9th", "11th", "13th", "Dim"],
+  "scaleModifcaitons": ["b", "#"],
+  "inversions": ["root", "1st", "2nd", "3rd"]
+}
