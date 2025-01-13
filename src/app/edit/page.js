@@ -24,7 +24,11 @@ import {
 import { useRouter } from "next/navigation";
 import { useSongContext } from "@/context/SongContext";
 import useWaveSurfer from "@/hooks/useWaveSurfer";
-import { assembleNestedJSON, disassembleFlatJSON, downloadJSONFile } from "@/utils/jsonHandler";
+import {
+  assembleNestedJSON,
+  assembleFlatJSON,
+  downloadJSONFile,
+} from "@/utils/jsonHandler";
 import useMarkerEditor from "@/hooks/useMarkerEditor";
 import EditPlayBarGrid from "@/components/EditPlayBarGrid";
 import WaveformViewer from "@/components/WaveFormViewer";
@@ -147,7 +151,10 @@ export default function EditPage() {
    */
   useEffect(() => {
     if (!autoLoaded && songData?.songInfo?.songPathFile) {
-      console.log("EditPage => auto-load track:", songData.songInfo.songPathFile);
+      console.log(
+        "EditPage => auto-load track:",
+        songData.songInfo.songPathFile,
+      );
       loadSong(songData.songInfo.songPathFile);
       setAutoLoaded(true);
     }
@@ -156,12 +163,8 @@ export default function EditPage() {
   /**
    * useMarkerEditor for local marker editing
    */
-  const {
-    sections,
-    finalizeAndGetJSON,
-    applyBarLengthFromBar,
-    adjustBarTime,
-  } = useMarkerEditor(songData || {});
+  const { sections, finalizeAndGetJSON, applyBarLengthFromBar, adjustBarTime } =
+    useMarkerEditor(songData || {});
 
   /**
    * snippet playback: play from start..end
@@ -192,7 +195,7 @@ export default function EditPage() {
       return;
     }
     try {
-      const updatedFlat = disassembleFlatJSON(updatedNested);
+      const updatedFlat = assembleFlatJSON(updatedNested);
       const resp = await fetch("/api/markers", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -223,8 +226,11 @@ export default function EditPage() {
     console.log("EditPage => handleSaveAsFlat => export JSON");
     const updatedNested = finalizeAndGetJSON();
     if (!updatedNested) return;
-    const updatedFlat = disassembleFlatJSON(updatedNested);
-    downloadJSONFile(updatedFlat, `${updatedNested.songId || "Song"}_edited.json`);
+    const updatedFlat = assembleFlatJSON(updatedNested);
+    downloadJSONFile(
+      updatedFlat,
+      `${updatedNested.songId || "Song"}_edited.json`,
+    );
   };
 
   /**
@@ -332,10 +338,10 @@ export default function EditPage() {
           onPlayBar={(start, end) => handlePlayBar(start, end)}
         />
 
-      <Button variant="outlined" onClick={handleSaveAsFlat}>
+        <Button variant="outlined" onClick={handleSaveAsFlat}>
           Export JSON
         </Button>
-              </Box>
+      </Box>
 
       <Snackbar
         open={snackbar.open}

@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { assembleNestedJSON, disassembleFlatJSON } from "@/utils/jsonHandler";
+import { assembleNestedJSON, assembleFlatJSON } from "@/utils/jsonHandler";
 
 const SongContext = createContext();
 
@@ -114,7 +114,7 @@ export function SongProvider({ children }) {
 
   async function saveMarkerData(nestedJson) {
     // disassemble => PUT
-    const flatData = await disassembleFlatJSON(nestedJson);
+    const flatData = await assembleFlatJSON(nestedJson);
     const sid = nestedJson.songInfo?.songID || "Unknown";
     flatData.songId = sid;
 

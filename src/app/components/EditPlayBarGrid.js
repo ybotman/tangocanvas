@@ -37,7 +37,12 @@ export default function EditPlayBarGrid({
    * Play from bar.start..bar.end (or up to nextBar.start if desired).
    */
   const handlePlay = (bar, nextBar) => {
-    console.log("EditPlayBarGrid => handlePlay => Bar", bar, "nextBar", nextBar);
+    console.log(
+      "EditPlayBarGrid => handlePlay => Bar",
+      bar,
+      "nextBar",
+      nextBar,
+    );
     if (nextBar) {
       onPlayBar(bar.start, nextBar.start);
     } else {
@@ -111,7 +116,9 @@ export default function EditPlayBarGrid({
                     </Box>
 
                     {/* ROW 2: start..end */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
                       <Typography variant="body2">
                         {bar.start.toFixed(2)}s
                       </Typography>

@@ -44,7 +44,7 @@ export default function useWaveSurfer({
         "useWaveSurfer => entering playSnippet with",
         startSec,
         snippetDuration,
-        isReady
+        isReady,
       );
 
       if (!waveSurferRef.current) {
@@ -54,7 +54,9 @@ export default function useWaveSurfer({
 
       // If wave is not yet loaded, queue the snippet
       if (!isReady) {
-        console.warn("useWaveSurfer => wave not ready => queue snippet request");
+        console.warn(
+          "useWaveSurfer => wave not ready => queue snippet request",
+        );
         snippetRequestRef.current = {
           startSec,
           snippetLen: snippetDuration,
@@ -83,8 +85,6 @@ export default function useWaveSurfer({
       if (startSec + finalSnippet > dur) {
         finalSnippet = dur - startSec;
       }
-
-
 
       // Stop, then play
       ws.stop();

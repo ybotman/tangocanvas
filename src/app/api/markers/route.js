@@ -125,9 +125,11 @@ export async function POST(request) {
  */
 export async function PUT(request) {
   console.log("PUT /api/markers");
+
   try {
     const body = await request.json();
     const { songId, ...rest } = body;
+    console.log("PUT /api/markers =>", songId, rest, body);
 
     if (!songId) {
       return NextResponse.json(

@@ -25,7 +25,7 @@ export function useWaveSurferContext() {
 }
 
 export function WaveSurferProvider({ children }) {
- // console.log("entering WaveSurferProvider with children");
+  // console.log("entering WaveSurferProvider with children");
   const waveSurferRef = useRef(null);
   const [isReady, setIsReady] = useState(false);
 
@@ -55,7 +55,7 @@ export function WaveSurferProvider({ children }) {
 
     waveSurferRef.current.on("ready", () => {
       setIsReady(true);
-  //    console.log("WaveSurferContext => wave is ready (event).");
+      //    console.log("WaveSurferContext => wave is ready (event).");
     });
 
     waveSurferRef.current.on("error", (err) => {
@@ -64,7 +64,7 @@ export function WaveSurferProvider({ children }) {
   }, []);
 
   const loadSong = useCallback((url) => {
- //   console.log("WaveSurferContext => loadSong with url", url);
+    //   console.log("WaveSurferContext => loadSong with url", url);
     if (!waveSurferRef.current) {
       console.warn(
         "WaveSurferContext => waveSurfer not inited => cannot loadSong",
@@ -77,7 +77,7 @@ export function WaveSurferProvider({ children }) {
 
   const playSnippet = useCallback(
     (startSec, snippetDuration = 5) => {
-  //    console.log("WaveSurferContext => playSnippet with startSec, snippetDuration" startSec,snippetDuration, );
+      //    console.log("WaveSurferContext => playSnippet with startSec, snippetDuration" startSec,snippetDuration, );
       if (!waveSurferRef.current) return;
       if (!isReady) return;
 
@@ -91,7 +91,7 @@ export function WaveSurferProvider({ children }) {
 
       setTimeout(() => {
         ws.stop();
-      //  console.log("WaveSurferContext => snippet ended");
+        //  console.log("WaveSurferContext => snippet ended");
       }, snippetDuration * 1000);
     },
     [isReady],
