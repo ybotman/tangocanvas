@@ -15,33 +15,33 @@
       "type": "section",
       "name": "Section 1",
       "startTime": 0,
-      "endTime": 76.28,
+      "endTime": 72.18,
       "startBarId": "1",
       "endBarId": "32",
       "start": 0,
-      "end": 76.28
+      "end": 72.18
     },
     {
       "id": 2,
       "type": "section",
       "name": "Section 2",
-      "startTime": 76.28,
-      "endTime": 152.76,
+      "startTime": 72.18,
+      "endTime": 143.86,
       "startBarId": "33",
       "endBarId": "64",
-      "start": 76.28,
-      "end": 152.76
+      "start": 72.18,
+      "end": 143.86
     },
     {
       "id": 3,
       "type": "section",
       "name": "Section 3",
-      "startTime": 152.76,
-      "endTime": 229.24,
+      "startTime": 143.86,
+      "endTime": 215.54,
       "startBarId": "65",
       "endBarId": "96",
-      "start": 152.76,
-      "end": 229.24
+      "start": 143.86,
+      "end": 215.54
     }
   ],
   "bars": [
@@ -49,577 +49,577 @@
       "id": "1",
       "label": "Bar 1",
       "start": 0,
-      "end": 2.39
+      "end": 2.74
     },
     {
       "id": "2",
       "label": "Bar 2",
-      "start": 2.39,
-      "end": 4.78
+      "start": 2.74,
+      "end": 4.98
     },
     {
       "id": "3",
       "label": "Bar 3",
-      "start": 4.78,
-      "end": 7.17
+      "start": 4.98,
+      "end": 7.22
     },
     {
       "id": "4",
       "label": "Bar 4",
-      "start": 7.17,
-      "end": 9.56
+      "start": 7.22,
+      "end": 9.46
     },
     {
       "id": "5",
       "label": "Bar 5",
-      "start": 9.56,
-      "end": 11.95
+      "start": 9.46,
+      "end": 11.7
     },
     {
       "id": "6",
       "label": "Bar 6",
-      "start": 11.95,
-      "end": 14.34
+      "start": 11.7,
+      "end": 13.94
     },
     {
       "id": "7",
       "label": "Bar 7",
-      "start": 14.34,
-      "end": 16.73
+      "start": 13.94,
+      "end": 16.18
     },
     {
       "id": "8",
       "label": "Bar 8",
-      "start": 16.73,
-      "end": 19.12
+      "start": 16.18,
+      "end": 18.42
     },
     {
       "id": "9",
       "label": "Bar 9",
-      "start": 19.12,
-      "end": 21.51
+      "start": 18.42,
+      "end": 20.66
     },
     {
       "id": "10",
       "label": "Bar 10",
-      "start": 21.51,
-      "end": 23.9
+      "start": 20.66,
+      "end": 22.9
     },
     {
       "id": "11",
       "label": "Bar 11",
-      "start": 23.9,
-      "end": 26.29
+      "start": 22.9,
+      "end": 25.14
     },
     {
       "id": "12",
       "label": "Bar 12",
-      "start": 26.29,
-      "end": 28.68
+      "start": 25.14,
+      "end": 27.38
     },
     {
       "id": "13",
       "label": "Bar 13",
-      "start": 28.68,
-      "end": 31.07
+      "start": 27.38,
+      "end": 29.62
     },
     {
       "id": "14",
       "label": "Bar 14",
-      "start": 31.07,
-      "end": 33.46
+      "start": 29.62,
+      "end": 31.86
     },
     {
       "id": "15",
       "label": "Bar 15",
-      "start": 33.46,
-      "end": 35.85
+      "start": 31.86,
+      "end": 34.1
     },
     {
       "id": "16",
       "label": "Bar 16",
-      "start": 35.85,
-      "end": 38.24
+      "start": 34.1,
+      "end": 36.34
     },
     {
       "id": "17",
       "label": "Bar 17",
-      "start": 38.24,
-      "end": 40.63
+      "start": 36.34,
+      "end": 38.58
     },
     {
       "id": "18",
       "label": "Bar 18",
-      "start": 40.63,
-      "end": 43.02
+      "start": 38.58,
+      "end": 40.82
     },
     {
       "id": "19",
       "label": "Bar 19",
-      "start": 43.02,
-      "end": 45.41
+      "start": 40.82,
+      "end": 43.06
     },
     {
       "id": "20",
       "label": "Bar 20",
-      "start": 45.41,
-      "end": 47.8
+      "start": 43.06,
+      "end": 45.3
     },
     {
       "id": "21",
       "label": "Bar 21",
-      "start": 47.8,
-      "end": 50.19
+      "start": 45.3,
+      "end": 47.54
     },
     {
       "id": "22",
       "label": "Bar 22",
-      "start": 50.19,
-      "end": 52.58
+      "start": 47.54,
+      "end": 49.78
     },
     {
       "id": "23",
       "label": "Bar 23",
-      "start": 52.58,
-      "end": 54.97
+      "start": 49.78,
+      "end": 52.02
     },
     {
       "id": "24",
       "label": "Bar 24",
-      "start": 54.97,
-      "end": 57.36
+      "start": 52.02,
+      "end": 54.26
     },
     {
       "id": "25",
       "label": "Bar 25",
-      "start": 57.36,
-      "end": 59.75
+      "start": 54.26,
+      "end": 56.5
     },
     {
       "id": "26",
       "label": "Bar 26",
-      "start": 59.75,
-      "end": 62.14
+      "start": 56.5,
+      "end": 58.74
     },
     {
       "id": "27",
       "label": "Bar 27",
-      "start": 62.14,
-      "end": 64.53
+      "start": 58.74,
+      "end": 60.98
     },
     {
       "id": "28",
       "label": "Bar 28",
-      "start": 64.53,
-      "end": 66.92
+      "start": 60.98,
+      "end": 63.22
     },
     {
       "id": "29",
       "label": "Bar 29",
-      "start": 66.92,
-      "end": 69.31
+      "start": 63.22,
+      "end": 65.46
     },
     {
       "id": "30",
       "label": "Bar 30",
-      "start": 69.31,
-      "end": 71.7
+      "start": 65.46,
+      "end": 67.7
     },
     {
       "id": "31",
       "label": "Bar 31",
-      "start": 71.7,
-      "end": 74.09
+      "start": 67.7,
+      "end": 69.94
     },
     {
       "id": "32",
       "label": "Bar 32",
-      "start": 74.09,
-      "end": 76.28
+      "start": 69.94,
+      "end": 72.18
     },
     {
       "id": "33",
       "label": "Bar 33",
-      "start": 76.28,
-      "end": 78.67
+      "start": 72.18,
+      "end": 74.42
     },
     {
       "id": "34",
       "label": "Bar 34",
-      "start": 78.67,
-      "end": 81.06
+      "start": 74.42,
+      "end": 76.66
     },
     {
       "id": "35",
       "label": "Bar 35",
-      "start": 81.06,
-      "end": 83.45
+      "start": 76.66,
+      "end": 78.9
     },
     {
       "id": "36",
       "label": "Bar 36",
-      "start": 83.45,
-      "end": 85.84
+      "start": 78.9,
+      "end": 81.14
     },
     {
       "id": "37",
       "label": "Bar 37",
-      "start": 85.84,
-      "end": 88.23
+      "start": 81.14,
+      "end": 83.38
     },
     {
       "id": "38",
       "label": "Bar 38",
-      "start": 88.23,
-      "end": 90.62
+      "start": 83.38,
+      "end": 85.62
     },
     {
       "id": "39",
       "label": "Bar 39",
-      "start": 90.62,
-      "end": 93.01
+      "start": 85.62,
+      "end": 87.86
     },
     {
       "id": "40",
       "label": "Bar 40",
-      "start": 93.01,
-      "end": 95.4
+      "start": 87.86,
+      "end": 90.1
     },
     {
       "id": "41",
       "label": "Bar 41",
-      "start": 95.4,
-      "end": 97.79
+      "start": 90.1,
+      "end": 92.34
     },
     {
       "id": "42",
       "label": "Bar 42",
-      "start": 97.79,
-      "end": 100.18
+      "start": 92.34,
+      "end": 94.58
     },
     {
       "id": "43",
       "label": "Bar 43",
-      "start": 100.18,
-      "end": 102.57
+      "start": 94.58,
+      "end": 96.82
     },
     {
       "id": "44",
       "label": "Bar 44",
-      "start": 102.57,
-      "end": 104.96
+      "start": 96.82,
+      "end": 99.06
     },
     {
       "id": "45",
       "label": "Bar 45",
-      "start": 104.96,
-      "end": 107.35
+      "start": 99.06,
+      "end": 101.3
     },
     {
       "id": "46",
       "label": "Bar 46",
-      "start": 107.35,
-      "end": 109.74
+      "start": 101.3,
+      "end": 103.54
     },
     {
       "id": "47",
       "label": "Bar 47",
-      "start": 109.74,
-      "end": 112.13
+      "start": 103.54,
+      "end": 105.78
     },
     {
       "id": "48",
       "label": "Bar 48",
-      "start": 112.13,
-      "end": 114.52
+      "start": 105.78,
+      "end": 108.02
     },
     {
       "id": "49",
       "label": "Bar 49",
-      "start": 114.52,
-      "end": 116.91
+      "start": 108.02,
+      "end": 110.26
     },
     {
       "id": "50",
       "label": "Bar 50",
-      "start": 116.91,
-      "end": 119.3
+      "start": 110.26,
+      "end": 112.5
     },
     {
       "id": "51",
       "label": "Bar 51",
-      "start": 119.3,
-      "end": 121.69
+      "start": 112.5,
+      "end": 114.74
     },
     {
       "id": "52",
       "label": "Bar 52",
-      "start": 121.69,
-      "end": 124.08
+      "start": 114.74,
+      "end": 116.98
     },
     {
       "id": "53",
       "label": "Bar 53",
-      "start": 124.08,
-      "end": 126.47
+      "start": 116.98,
+      "end": 119.22
     },
     {
       "id": "54",
       "label": "Bar 54",
-      "start": 126.47,
-      "end": 128.86
+      "start": 119.22,
+      "end": 121.46
     },
     {
       "id": "55",
       "label": "Bar 55",
-      "start": 128.86,
-      "end": 131.25
+      "start": 121.46,
+      "end": 123.7
     },
     {
       "id": "56",
       "label": "Bar 56",
-      "start": 131.25,
-      "end": 133.64
+      "start": 123.7,
+      "end": 125.94
     },
     {
       "id": "57",
       "label": "Bar 57",
-      "start": 133.64,
-      "end": 136.03
+      "start": 125.94,
+      "end": 128.18
     },
     {
       "id": "58",
       "label": "Bar 58",
-      "start": 136.03,
-      "end": 138.42
+      "start": 128.18,
+      "end": 130.42
     },
     {
       "id": "59",
       "label": "Bar 59",
-      "start": 138.42,
-      "end": 140.81
+      "start": 130.42,
+      "end": 132.66
     },
     {
       "id": "60",
       "label": "Bar 60",
-      "start": 140.81,
-      "end": 143.2
+      "start": 132.66,
+      "end": 134.9
     },
     {
       "id": "61",
       "label": "Bar 61",
-      "start": 143.2,
-      "end": 145.59
+      "start": 134.9,
+      "end": 137.14
     },
     {
       "id": "62",
       "label": "Bar 62",
-      "start": 145.59,
-      "end": 147.98
+      "start": 137.14,
+      "end": 139.38
     },
     {
       "id": "63",
       "label": "Bar 63",
-      "start": 147.98,
-      "end": 150.37
+      "start": 139.38,
+      "end": 141.62
     },
     {
       "id": "64",
       "label": "Bar 64",
-      "start": 150.37,
-      "end": 152.76
+      "start": 141.62,
+      "end": 143.86
     },
     {
       "id": "65",
       "label": "Bar 65",
-      "start": 152.76,
-      "end": 155.15
+      "start": 143.86,
+      "end": 146.1
     },
     {
       "id": "66",
       "label": "Bar 66",
-      "start": 155.15,
-      "end": 157.54
+      "start": 146.1,
+      "end": 148.34
     },
     {
       "id": "67",
       "label": "Bar 67",
-      "start": 157.54,
-      "end": 159.93
+      "start": 148.34,
+      "end": 150.58
     },
     {
       "id": "68",
       "label": "Bar 68",
-      "start": 159.93,
-      "end": 162.32
+      "start": 150.58,
+      "end": 152.82
     },
     {
       "id": "69",
       "label": "Bar 69",
-      "start": 162.32,
-      "end": 164.71
+      "start": 152.82,
+      "end": 155.06
     },
     {
       "id": "70",
       "label": "Bar 70",
-      "start": 164.71,
-      "end": 167.1
+      "start": 155.06,
+      "end": 157.3
     },
     {
       "id": "71",
       "label": "Bar 71",
-      "start": 167.1,
-      "end": 169.49
+      "start": 157.3,
+      "end": 159.54
     },
     {
       "id": "72",
       "label": "Bar 72",
-      "start": 169.49,
-      "end": 171.88
+      "start": 159.54,
+      "end": 161.78
     },
     {
       "id": "73",
       "label": "Bar 73",
-      "start": 171.88,
-      "end": 174.27
+      "start": 161.78,
+      "end": 164.02
     },
     {
       "id": "74",
       "label": "Bar 74",
-      "start": 174.27,
-      "end": 176.66
+      "start": 164.02,
+      "end": 166.26
     },
     {
       "id": "75",
       "label": "Bar 75",
-      "start": 176.66,
-      "end": 179.05
+      "start": 166.26,
+      "end": 168.5
     },
     {
       "id": "76",
       "label": "Bar 76",
-      "start": 179.05,
-      "end": 181.44
+      "start": 168.5,
+      "end": 170.74
     },
     {
       "id": "77",
       "label": "Bar 77",
-      "start": 181.44,
-      "end": 183.83
+      "start": 170.74,
+      "end": 172.98
     },
     {
       "id": "78",
       "label": "Bar 78",
-      "start": 183.83,
-      "end": 186.22
+      "start": 172.98,
+      "end": 175.22
     },
     {
       "id": "79",
       "label": "Bar 79",
-      "start": 186.22,
-      "end": 188.61
+      "start": 175.22,
+      "end": 177.46
     },
     {
       "id": "80",
       "label": "Bar 80",
-      "start": 188.61,
-      "end": 191
+      "start": 177.46,
+      "end": 179.7
     },
     {
       "id": "81",
       "label": "Bar 81",
-      "start": 191,
-      "end": 193.39
+      "start": 179.7,
+      "end": 181.94
     },
     {
       "id": "82",
       "label": "Bar 82",
-      "start": 193.39,
-      "end": 195.78
+      "start": 181.94,
+      "end": 184.18
     },
     {
       "id": "83",
       "label": "Bar 83",
-      "start": 195.78,
-      "end": 198.17
+      "start": 184.18,
+      "end": 186.42
     },
     {
       "id": "84",
       "label": "Bar 84",
-      "start": 198.17,
-      "end": 200.56
+      "start": 186.42,
+      "end": 188.66
     },
     {
       "id": "85",
       "label": "Bar 85",
-      "start": 200.56,
-      "end": 202.95
+      "start": 188.66,
+      "end": 190.9
     },
     {
       "id": "86",
       "label": "Bar 86",
-      "start": 202.95,
-      "end": 205.34
+      "start": 190.9,
+      "end": 193.14
     },
     {
       "id": "87",
       "label": "Bar 87",
-      "start": 205.34,
-      "end": 207.73
+      "start": 193.14,
+      "end": 195.38
     },
     {
       "id": "88",
       "label": "Bar 88",
-      "start": 207.73,
-      "end": 210.12
+      "start": 195.38,
+      "end": 197.62
     },
     {
       "id": "89",
       "label": "Bar 89",
-      "start": 210.12,
-      "end": 212.51
+      "start": 197.62,
+      "end": 199.86
     },
     {
       "id": "90",
       "label": "Bar 90",
-      "start": 212.51,
-      "end": 214.9
+      "start": 199.86,
+      "end": 202.1
     },
     {
       "id": "91",
       "label": "Bar 91",
-      "start": 214.9,
-      "end": 217.29
+      "start": 202.1,
+      "end": 204.34
     },
     {
       "id": "92",
       "label": "Bar 92",
-      "start": 217.29,
-      "end": 219.68
+      "start": 204.34,
+      "end": 206.58
     },
     {
       "id": "93",
       "label": "Bar 93",
-      "start": 219.68,
-      "end": 222.07
+      "start": 206.58,
+      "end": 208.82
     },
     {
       "id": "94",
       "label": "Bar 94",
-      "start": 222.07,
-      "end": 224.46
+      "start": 208.82,
+      "end": 211.06
     },
     {
       "id": "95",
       "label": "Bar 95",
-      "start": 224.46,
-      "end": 226.85
+      "start": 211.06,
+      "end": 213.3
     },
     {
       "id": "96",
       "label": "Bar 96",
-      "start": 226.85,
-      "end": 229.24
+      "start": 213.3,
+      "end": 215.54
     }
   ],
   "Rhythms": [

@@ -331,7 +331,7 @@ export default function EditPage() {
       </Box>
       <Box sx={{ mb: 2 }}>
         <Button variant="contained" onClick={handleSave}>
-          Save Markers
+          Save Bar Markers
         </Button>
       </Box>
 

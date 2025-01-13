@@ -4,7 +4,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { assembleNestedJSON, assembleFlatJSON } from "@/utils/jsonHandler";
 
 const SongContext = createContext();
 
@@ -95,41 +94,6 @@ export function SongProvider({ children }) {
     }
   }, [selectedSong]);
 
-  /**
-   * 4) readMarkerData / saveMarkerData if needed
-   */
-  async function readMarkerDataXXX(songId) {
-    const url = `/api/markers?songId=${encodeURIComponent(songId)}`;
-    const resp = await fetch(url);
-    if (!resp.ok) {
-      throw new Error(`Failed GET /api/markers => ${resp.status}`);
-    }
-    const flatData = await resp.json();
-    console.log("SongContext => readMarkerDataXXX => flat:", flatData);
-
-    const nested = await assembleNestedJSON(flatData);
-    console.log("SongContext => readMarkerDataXXX => nested:", nested);
-    return nested;
-  }
-
-  async function saveMarkerDataXXX(nestedJson) {
-    console.log("SongContext => saveMarkerData => nested:", nestedJson);
-    // disassemble => PUT
-    const flatData = await assembleFlatJSON(nestedJson);
-    const sid = nestedJson.songInfo?.songId || "Unknown";
-    flatData.songId = sid;
-
-    const resp = await fetch("/api/markers", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(flatData),
-    });
-    if (!resp.ok) {
-      const out = await resp.json().catch(() => ({}));
-      throw new Error(out.error || "PUT /api/markers failed");
-    }
-    console.log("SongContext => saveMarkerData => success.");
-  }
 
   const value = {
     songs,
@@ -137,8 +101,6 @@ export function SongProvider({ children }) {
     error,
     selectedSong,
     setSelectedSong,
-    readMarkerDataXXX,
-    saveMarkerDataXXX,
   };
 
   return <SongContext.Provider value={value}>{children}</SongContext.Provider>;

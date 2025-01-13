@@ -1,11 +1,3 @@
-/**
- * src/app/hooks/useWaveSurfer.js
- *
- * Production-ready local-wave approach for the PlayPage.
- * In your steps:
- *   - onInit => initWaveSurfer => loadSong => snippet, etc.
- */
-
 "use client";
 
 import { useRef, useCallback, useState } from "react";
@@ -14,57 +6,66 @@ import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.js";
 
+/**
+ * useWaveSurfer
+ *
+ * - Default snippet length = (snippetDuration + 5)
+ * - Fade out in the last 0.5s
+ * - If snippet is shorter than 0.5s, we skip fade and just stop.
+ */
 export default function useWaveSurfer({
   containerRef,
   timelineRef = null,
   enableClickableWaveform = true,
 }) {
-  console.log("entering useWaveSurfer with containerRef=", containerRef);
-
   const waveSurferRef = useRef(null);
 
-  // Stores snippet request if wave not ready yet
   const snippetRequestRef = useRef(null);
-
-  // snippet auto-stop timer
   const snippetTimeoutRef = useRef(null);
 
-  // local states
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // We'll always fade for 0.5s at the end
+  const fadeOutDuration = 0.5; // in seconds
+
   /**
    * playSnippet:
-   *  - If wave not ready => queue the snippet request (so we don't skip).
-   *  - Otherwise, plays the snippet from `startSec` for `snippetDuration`.
+   *   - If no "extra" param is provided, we add 5 by default
+   *   - Fade out in the last 0.5s
    */
   const playSnippet = useCallback(
-    (startSec, snippetDuration = 4.5) => {
+    (
+      startSec,
+      snippetDuration = 4.5,
+      extraPad = 5, // default 5 extra seconds
+    ) => {
       console.log(
-        "useWaveSurfer => entering playSnippet with",
+        "useWaveSurfer => playSnippet => time:",
         startSec,
+        "duration:",
         snippetDuration,
-        isReady,
+        "extraPad:",
+        extraPad,
+        "isReady?",
+        isReady
       );
 
       if (!waveSurferRef.current) {
-        console.warn("useWaveSurfer => no wave => skip snippet");
+        console.warn("useWaveSurfer => wave is null => skip snippet");
         return;
       }
-
-      // If wave is not yet loaded, queue the snippet
       if (!isReady) {
-        console.warn(
-          "useWaveSurfer => wave not ready => queue snippet request",
-        );
+        console.warn("useWaveSurfer => wave not ready => queue snippet");
         snippetRequestRef.current = {
           startSec,
           snippetLen: snippetDuration,
+          extraPad,
         };
         return;
       }
 
-      // Clear old snippet timer
+      // Clear old timer
       if (snippetTimeoutRef.current) {
         clearTimeout(snippetTimeoutRef.current);
         snippetTimeoutRef.current = null;
@@ -76,46 +77,77 @@ export default function useWaveSurfer({
         console.warn("useWaveSurfer => wave duration=0 => skip snippet");
         return;
       }
-      if (startSec >= dur) {
-        console.warn("useWaveSurfer => startSec >= wave dur => skip snippet");
-        return;
+
+      // Final snippet length = user snippet + default 5s (if not provided)
+      let finalLen = snippetDuration + extraPad;
+
+      // If it exceeds the wave's end, clamp it
+      if (startSec + finalLen > dur) {
+        finalLen = dur - startSec;
       }
 
-      let finalSnippet = snippetDuration;
-      if (startSec + finalSnippet > dur) {
-        finalSnippet = dur - startSec;
-      }
-
-      // Stop, then play
+      // Stop current wave, seek, and play
       ws.stop();
       ws.seekTo(startSec / dur);
       ws.play();
       console.log(
-        `useWaveSurfer => snippet start @ ${startSec} for ${finalSnippet}`,
+        "useWaveSurfer => snippet start @",
+        startSec,
+        "for",
+        finalLen,
+        "s (includes extraPad)."
       );
 
+      // We'll fade out over last 0.5s
+      // If finalLen < 0.5 => skip fade, just do immediate stop
+      if (finalLen <= fadeOutDuration) {
+        // Entire snippet is shorter than fade
+        snippetTimeoutRef.current = setTimeout(() => {
+          ws.stop();
+          console.log("useWaveSurfer => snippet ended (too short for fade).");
+        }, finalLen * 1000);
+        return;
+      }
+
+      // Otherwise, let's do a fade in the last 0.5s
+      const fadeStartMs = (finalLen - fadeOutDuration) * 1000;
+      const originalVolume = ws.getVolume();
+      const stepCount = 10; // # steps in the fade
+      const stepTimeMs = (fadeOutDuration / stepCount) * 1000; // ms per step
+      const volumeDecrement = originalVolume / stepCount;
+
+      // 1) Wait until snippet's last 0.5s => then start fade
       snippetTimeoutRef.current = setTimeout(() => {
-        if (waveSurferRef.current) {
-          waveSurferRef.current.stop();
-          console.log("useWaveSurfer => snippet ended after timer");
+        console.log("useWaveSurfer => fade-out begins...");
+
+        for (let i = 1; i <= stepCount; i++) {
+          setTimeout(() => {
+            const newVol = Math.max(
+              originalVolume - volumeDecrement * i,
+              0
+            );
+            ws.setVolume(newVol);
+          }, i * stepTimeMs);
         }
-      }, finalSnippet * 1000);
+
+        // After fade completes => stop wave + restore volume
+        setTimeout(() => {
+          ws.stop();
+          // optional: restore wave volume for next snippet
+          ws.setVolume(originalVolume);
+          console.log("useWaveSurfer => snippet ended after fade-out");
+        }, fadeOutDuration * 1000);
+      }, fadeStartMs);
     },
-    [isReady],
+    [isReady]
   );
 
   /**
-   * initWaveSurfer:
-   *  - Creates the WaveSurfer instance if not yet created.
-   *  - Sets up event handlers, including an "on('ready')" that checks snippetRequestRef.
+   * initWaveSurfer => create wave once, set up listeners
    */
   const initWaveSurfer = useCallback(() => {
-    console.log(
-      "useWaveSurfer => initWaveSurfer() called with waveSurferRef.current:",
-      waveSurferRef.current,
-    );
     if (waveSurferRef.current) {
-      console.warn("useWaveSurfer => waveSurfer already created => skipping");
+      console.warn("useWaveSurfer => waveSurfer already created => skip init");
       return;
     }
     if (!containerRef.current) {
@@ -134,7 +166,7 @@ export default function useWaveSurfer({
       plugins: [
         timelineRef
           ? TimelinePlugin.create({
-              container: timelineRef,
+              container: timelineRef.current,
               primaryColor: "#666",
               primaryFontColor: "#666",
               height: 20,
@@ -144,20 +176,19 @@ export default function useWaveSurfer({
       ].filter(Boolean),
     });
 
+    waveSurferRef.current.on("loading", (pct) => {
+      console.log("useWaveSurfer => loading =>", pct, "%");
+    });
+
     waveSurferRef.current.on("ready", () => {
-      console.log("useWaveSurfer => on('ready') event");
+      console.log("useWaveSurfer => wave is READY => setIsReady(true)");
       setIsReady(true);
 
-      // If we previously queued a snippet, play it immediately now
+      // If user queued snippet earlier
       if (snippetRequestRef.current) {
-        const { startSec, snippetLen } = snippetRequestRef.current;
+        const { startSec, snippetLen, extraPad } = snippetRequestRef.current;
         snippetRequestRef.current = null;
-        console.log(
-          "useWaveSurfer => wave is now ready => playing queued snippet",
-          startSec,
-          snippetLen,
-        );
-        playSnippet(startSec, snippetLen);
+        playSnippet(startSec, snippetLen, extraPad);
       }
     });
 
@@ -167,83 +198,57 @@ export default function useWaveSurfer({
 
     waveSurferRef.current.on("play", () => {
       setIsPlaying(true);
-      console.log("useWaveSurfer => wave playing");
+      console.log("useWaveSurfer => wave playing event");
     });
     waveSurferRef.current.on("pause", () => {
       setIsPlaying(false);
-      console.log("useWaveSurfer => wave paused");
+      console.log("useWaveSurfer => wave paused event");
     });
     waveSurferRef.current.on("finish", () => {
       setIsPlaying(false);
-      console.log("useWaveSurfer => wave finished");
+      console.log("useWaveSurfer => wave finished event");
     });
 
     if (enableClickableWaveform) {
-      waveSurferRef.current.on("seek", () => {
-        const clickTime = waveSurferRef.current.getCurrentTime();
-        console.log("useWaveSurfer => waveform clicked => time", clickTime);
-        // By calling playSnippet directly, if isReady is false, it will queue it.
-        playSnippet(clickTime, 5);
+      waveSurferRef.current.on("interaction", () => {
+        const ws = waveSurferRef.current;
+        const time = ws.getCurrentTime();
+        console.log("useWaveSurfer => user clicked => time:", time);
+        // Click => snippet of 4.5 + default 5 => 9.5s total (minus fade).
+        playSnippet(time, 4.5);
       });
     }
 
     console.log("useWaveSurfer => waveSurfer instance created OK.");
   }, [containerRef, timelineRef, enableClickableWaveform, playSnippet]);
 
-  /**
-   * loadSong:
-   *  - Resets isReady to false, calls waveSurfer.load(url).
-   *  - The "on('ready')" callback will set isReady = true.
-   */
+  /** loadSong => waveSurfer.load(url) + reset isReady */
   const loadSong = useCallback((url) => {
-    console.log("useWaveSurfer => loadSong with url:", url);
-    if (!waveSurferRef.current) {
-      console.warn("useWaveSurfer => wave not inited => skipping load");
-      return;
-    }
+    console.log("useWaveSurfer => loadSong =>", url);
+    if (!waveSurferRef.current) return;
     setIsReady(false);
     waveSurferRef.current.load(url);
   }, []);
 
-  /**
-   * loadSongAndSnippet:
-   *  - Also sets isReady=false, queues snippet in snippetRequestRef, then loads the wave.
-   */
-  const loadSongAndSnippet = useCallback((url, startSec, snippetLen) => {
-    console.log(
-      "useWaveSurfer => loadSongAndSnippet => requesting snippet",
-      startSec,
-      snippetLen,
-    );
-    if (!waveSurferRef.current) {
-      console.warn(
-        "useWaveSurfer => wave not inited => skip loadSongAndSnippet",
-      );
-      return;
-    }
+  /** loadSongAndSnippet => same, but queue snippet */
+  const loadSongAndSnippet = useCallback((url, startSec, snippetLen, extraPad) => {
+    console.log("useWaveSurfer => loadSongAndSnippet =>", url, startSec, snippetLen, extraPad);
+    if (!waveSurferRef.current) return;
     setIsReady(false);
-
-    // Store snippet request
-    snippetRequestRef.current = { startSec, snippetLen };
+    snippetRequestRef.current = { startSec, snippetLen, extraPad };
     waveSurferRef.current.load(url);
   }, []);
 
-  /**
-   * stopAudio:
-   *  - Manual stop
-   */
+  /** stopAudio => manual stop */
   const stopAudio = useCallback(() => {
     console.log("useWaveSurfer => stopAudio called");
     if (waveSurferRef.current) {
       waveSurferRef.current.stop();
-      console.log("useWaveSurfer => wave stopped by user");
+      console.log("useWaveSurfer => wave manually stopped");
     }
   }, []);
 
-  /**
-   * cleanupWaveSurfer:
-   *  - Destroy wave instance & reset states.
-   */
+  /** cleanupWaveSurfer => destroy wave, reset states */
   const cleanupWaveSurfer = useCallback(() => {
     console.log("useWaveSurfer => cleanupWaveSurfer called");
     if (snippetTimeoutRef.current) {
@@ -255,7 +260,7 @@ export default function useWaveSurfer({
     if (waveSurferRef.current) {
       try {
         waveSurferRef.current.destroy();
-        console.log("useWaveSurfer => wave destroyed");
+        console.log("useWaveSurfer => wave destroyed in cleanup");
       } catch (err) {
         console.error("useWaveSurfer => destroy error:", err);
       }
@@ -269,9 +274,9 @@ export default function useWaveSurfer({
     isReady,
     isPlaying,
     initWaveSurfer,
-    loadSong,
-    loadSongAndSnippet,
-    playSnippet,
+    loadSong,             // loadSong(url)
+    loadSongAndSnippet,   // loadSongAndSnippet(url, startSec, snippetLen, extraPad)
+    playSnippet,          // playSnippet(startSec, snippetDuration, extraPad)
     stopAudio,
     cleanupWaveSurfer,
   };
@@ -280,9 +285,6 @@ export default function useWaveSurfer({
 useWaveSurfer.propTypes = {
   containerRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) })
     .isRequired,
-  timelineRef: PropTypes.oneOfType([
-    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
-    PropTypes.oneOf([null]),
-  ]),
+  timelineRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   enableClickableWaveform: PropTypes.bool,
 };
