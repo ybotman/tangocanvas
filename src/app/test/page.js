@@ -58,7 +58,7 @@ export default function Page() {
 
       <Autocomplete
         options={songs}
-        getOptionLabel={(opt) => opt.songInfo?.songID || ""}
+        getOptionLabel={(opt) => opt.songInfo?.songId || ""}
         value={selectedSong || null}
         onChange={(_, newVal) => setSelectedSong(newVal)}
         renderInput={(params) => (

@@ -23,7 +23,7 @@ export function downloadJSONFile(jsonData, fileName = "updatedMarkers.json") {
  *    but the app will primarily look at "sections".
  */
 export async function assembleNestedJSON(flatJson) {
-  console.log("flatJson => assembleNestedJSON =>", flatJson);
+  console.log("flatJson =>1: assembleNestedJSON =>", flatJson);
 
   // 1) Extract what we need
   const { sectionsList, bars } = flatJson;
@@ -77,10 +77,10 @@ export async function assembleNestedJSON(flatJson) {
  *  - produce a top-level .bars array
  *  - produce a .sectionsList array (like the old "sectionsList" in flat JSON)
  *  - preserve other top-level fields (songInfo, Rhythms, chordNotation, etc.)
- *  - add top-level "songID" for server usage
+ *  - add top-level "songId" for server usage
  */
-export async function assembleFlatJSON(nestedJson) {
-  console.log("nestedJson => assembleFlatJSON =>", nestedJson);
+export function assembleFlatJSON(nestedJson) {
+  console.log("nestedJson => 1:assembleFlatJSON =>", nestedJson);
 
   // 1) Clone so we don't mutate
   const result = JSON.parse(JSON.stringify(nestedJson));
@@ -95,8 +95,8 @@ export async function assembleFlatJSON(nestedJson) {
 
   // If no sections => do minimal transformation
   if (!Array.isArray(sections) || sections.length === 0) {
-    const sid = songInfo?.songID || "UnknownSong";
-    result.songID = sid;
+    const sid = songInfo?.songId || "UnknownSong";
+    result.songId = sid;
     return result;
   }
 
@@ -157,21 +157,13 @@ export async function assembleFlatJSON(nestedJson) {
     chordNotation,
   };
 
-  // add top-level "songID" from songInfo
-  const sid = songInfo?.songID || "UnknownSong";
-  flatJson.songID = sid;
+  // add top-level "songId" from songInfo
+  const sid = songInfo?.songId || "UnknownSong";
+  flatJson.songId = sid;
 
   // You may optionally remove the old "sections" field if you don't want it in the final JSON:
   delete flatJson.sections; // if you want to remove "sections"
 
-  console.log("assembleFlatJSON => final FLAT =>", flatJson);
+  console.log("assembleFlatJSON => 2:final FLAT =>", flatJson);
   return flatJson;
 }
-
-/**
- * Optionally, any Node-based code here must run on the server, so if
- * you use "fs" or "path", that logic must live in a server environment,
- * not in a "use client" file.
- *
- * copyDefaultMarkerFile(songID) => ...
- */

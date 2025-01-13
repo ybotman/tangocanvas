@@ -87,14 +87,14 @@ export default function PlayPage() {
   useEffect(() => {
     console.log("PlayPage => useEffect => doFetch marker data");
     async function doFetch() {
-      if (!selectedSong?.songInfo?.songID) {
+      if (!selectedSong?.songInfo?.songId) {
         return;
       }
       setSongLoading(true);
       try {
-        const baseName = selectedSong.songInfo.songID;
+        const baseName = selectedSong.songInfo.songId;
         const resp = await fetch(
-          `/api/markers?songID=${encodeURIComponent(baseName)}`,
+          `/api/markers?songId=${encodeURIComponent(baseName)}`,
         );
         if (!resp.ok) {
           throw new Error(`Failed fetch => ${resp.status}`);
@@ -214,7 +214,7 @@ export default function PlayPage() {
       <Header />
 
       <Typography variant="h5" sx={{ mb: 1 }}>
-        Play Page – {markerData.songInfo.songID || "NoSong"}
+        Play Page – {markerData.songInfo.songId || "NoSong"}
       </Typography>
       <Typography variant="body2" sx={{ mb: 2 }}>
         isReady:{" "}

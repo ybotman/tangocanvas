@@ -21,7 +21,7 @@ export function downloadJSONFile(jsonData, fileName = "updatedMarkers.json") {
 export async function assembleNestedJSON(flatJson) {
   // Example structure:
   // flatJson = {
-  //   songInfo: { songID, songDuration, ...},
+  //   songInfo: { songId, songDuration, ...},
   //   sections: [{ id, startBarId, endBarId, ... }, ...],
   //   bars: [{ id, start, end, label }, ...]
   // }
@@ -66,7 +66,7 @@ export async function assembleNestedJSON(flatJson) {
  *  - Builds a top-level `sections` array, setting each startBarId/endBarId
  *    from the first/last marker
  *  - Preserves any other top-level fields (like .bars, if it existed) by spreading
- *  - Inserts a top-level `songID` to please your server PUT usage
+ *  - Inserts a top-level `songId` to please your server PUT usage
  */
 export async function assembleFlatJSON(nestedJson) {
   console.log("nestedJson disassemble request", nestedJson);
@@ -85,9 +85,9 @@ export async function assembleFlatJSON(nestedJson) {
   // If no sections => just return the result
   // (the user might not have sections or something)
   if (!Array.isArray(sections) || sections.length === 0) {
-    // Insert a top-level "songID" from the nested "songInfo.songID" (if it exists)
-    const sid = songInfo?.songID || "UnknownSong";
-    result.songID = sid;
+    // Insert a top-level "songId" from the nested "songInfo.songId" (if it exists)
+    const sid = songInfo?.songId || "UnknownSong";
+    result.songId = sid;
     return result;
   }
 
@@ -158,30 +158,30 @@ export async function assembleFlatJSON(nestedJson) {
     chordNotation,
   };
 
-  // 7) Insert a top-level "songID" from songInfo
-  const sid = songInfo?.songID || "UnknownSong";
-  flatJson.songID = sid;
+  // 7) Insert a top-level "songId" from songInfo
+  const sid = songInfo?.songId || "UnknownSong";
+  flatJson.songId = sid;
 
   console.log("assembleFlatJSON => final FLAT =>", flatJson);
   return flatJson;
 }
 
 /**
- * copyDefaultMarkerFile(songID)
- * Copies /public/masterData/defaultSong.json => /public/markers/<songID>-markers.json
+ * copyDefaultMarkerFile(songId)
+ * Copies /public/masterData/defaultSong.json => /public/markers/<songId>-markers.json
  */
-export async function copyDefaultMarkerFile(songID) {
+export async function copyDefaultMarkerFile(songId) {
   const masterDir = path.join(process.cwd(), "public", "masterData");
   const defaultPath = path.join(masterDir, "defaultSong.json");
   const markersDir = path.join(process.cwd(), "public", "markers");
-  const newFilePath = path.join(markersDir, `${songID}-markers.json`);
+  const newFilePath = path.join(markersDir, `${songId}-markers.json`);
 
   // read default
   const defaultRaw = await fs.readFile(defaultPath, "utf-8");
   const defaultJson = JSON.parse(defaultRaw);
 
   // rename inside JSON if needed
-  defaultJson.songInfo.songID = songID;
+  defaultJson.songInfo.songId = songId;
   console.log("Building defaultSong.json to", newFilePath);
   await fs.writeFile(
     newFilePath,

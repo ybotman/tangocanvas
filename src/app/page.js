@@ -76,7 +76,7 @@ export default function Page() {
       <Box sx={{ mb: 2, mt: 2 }}>
         <Typography variant="h5">
           Current Song:{" "}
-          <strong>{selectedSong?.songInfo?.songID || "None"}</strong>
+          <strong>{selectedSong?.songInfo?.songId || "None"}</strong>
         </Typography>
       </Box>
 
@@ -84,7 +84,7 @@ export default function Page() {
         <Autocomplete
           options={songs}
           getOptionLabel={(opt) => {
-            const id = opt.songInfo?.songID || "???";
+            const id = opt.songInfo?.songId || "???";
             const st = opt.songInfo?.state || "???";
             return `${id} (${st})`;
           }}
@@ -100,7 +100,7 @@ export default function Page() {
           )}
           autoHighlight
           isOptionEqualToValue={(opt, val) =>
-            opt.songInfo?.songID === val.songInfo?.songID
+            opt.songInfo?.songId === val.songInfo?.songId
           }
         />
       </Box>

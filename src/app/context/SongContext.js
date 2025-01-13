@@ -42,7 +42,7 @@ export function SongProvider({ children }) {
 
           // GET /api/markers? => auto-creates markers if missing
           const markerResp = await fetch(
-            `/api/markers?songID=${encodeURIComponent(baseName)}`,
+            `/api/markers?songId=${encodeURIComponent(baseName)}`,
           );
           if (!markerResp.ok) {
             console.warn(
@@ -70,7 +70,7 @@ export function SongProvider({ children }) {
   useEffect(() => {
     const lastSel = localStorage.getItem("lastSelectedSongId");
     if (lastSel) {
-      setSelectedSong({ songInfo: { songID: lastSel } });
+      setSelectedSong({ songInfo: { songId: lastSel } });
     }
   }, []);
 
@@ -78,9 +78,9 @@ export function SongProvider({ children }) {
    * 3) If we have partial `selectedSong`, refine it once `songs` is loaded
    */
   useEffect(() => {
-    if (!loading && selectedSong?.songInfo?.songID) {
+    if (!loading && selectedSong?.songInfo?.songId) {
       const found = songs.find(
-        (s) => s.songInfo?.songID === selectedSong.songInfo.songID,
+        (s) => s.songInfo?.songId === selectedSong.songInfo.songId,
       );
       if (found) {
         setSelectedSong(found);
@@ -90,16 +90,16 @@ export function SongProvider({ children }) {
 
   // Keep localStorage in sync
   useEffect(() => {
-    if (selectedSong?.songInfo?.songID) {
-      localStorage.setItem("lastSelectedSongId", selectedSong.songInfo.songID);
+    if (selectedSong?.songInfo?.songId) {
+      localStorage.setItem("lastSelectedSongId", selectedSong.songInfo.songId);
     }
   }, [selectedSong]);
 
   /**
    * 4) readMarkerData / saveMarkerData if needed
    */
-  async function readMarkerDataXXX(songID) {
-    const url = `/api/markers?songID=${encodeURIComponent(songID)}`;
+  async function readMarkerDataXXX(songId) {
+    const url = `/api/markers?songId=${encodeURIComponent(songId)}`;
     const resp = await fetch(url);
     if (!resp.ok) {
       throw new Error(`Failed GET /api/markers => ${resp.status}`);
@@ -116,8 +116,8 @@ export function SongProvider({ children }) {
     console.log("SongContext => saveMarkerData => nested:", nestedJson);
     // disassemble => PUT
     const flatData = await assembleFlatJSON(nestedJson);
-    const sid = nestedJson.songInfo?.songID || "Unknown";
-    flatData.songID = sid;
+    const sid = nestedJson.songInfo?.songId || "Unknown";
+    flatData.songId = sid;
 
     const resp = await fetch("/api/markers", {
       method: "PUT",

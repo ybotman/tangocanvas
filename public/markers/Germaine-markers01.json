@@ -1,48 +1,39 @@
 {
   "songInfo": {
-    "songId": "Amarras",
-    "fileName:": "UNK",
-    "orchestra": "UNK",
-    "songPathFile": "/songs/Amarras.mp3",
-    "jsonPathFile": "/markers/Amarras-markers.json",
+    "songId": "Germaine",
+    "fileName:": "Germaine.mp3",
+    "orchestra": "Germaine-markers.json",
+    "songPathFile": "/songs/Germaine.mp3",
+    "jsonPathFile": "/markers/Germaine-markers.json",
     "songDuration": 0,
-    "state": "Approved"
+    "state": "Matched"
   },
   "sectionsList": [
     {
       "id": 1,
-      "type": "intro",
-      "name": "intro",
-      "startTime": 0,
-      "endTime": 6,
-      "startBarId": "1",
-      "endBarId": "1"
-    },
-    {
-      "id": 2,
       "type": "section",
       "name": "Section 1",
       "startTime": 0,
       "endTime": 67.2,
-      "startBarId": "2",
-      "endBarId": "33"
+      "startBarId": "1",
+      "endBarId": "32"
     },
     {
-      "id": 3,
+      "id": 2,
       "type": "section",
       "name": "Section 2",
       "startTime": 67.2,
       "endTime": 134.4,
-      "startBarId": "34",
-      "endBarId": "62"
+      "startBarId": "33",
+      "endBarId": "64"
     },
     {
-      "id": 4,
+      "id": 3,
       "type": "section",
       "name": "Section 3",
       "startTime": 134.4,
       "endTime": 201.6,
-      "startBarId": "63",
+      "startBarId": "65",
       "endBarId": "96"
     }
   ],

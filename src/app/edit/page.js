@@ -100,7 +100,7 @@ export default function EditPage() {
         const baseName = filePath
           .replace(/^\/songs\//, "")
           .replace(/\.\w+$/, "");
-        const markerUrl = `/api/markers?songID=${encodeURIComponent(baseName)}`;
+        const markerUrl = `/api/markers?songId=${encodeURIComponent(baseName)}`;
 
         console.log("EditPage => fetching marker data =>", markerUrl);
         const resp = await fetch(markerUrl);
@@ -184,7 +184,7 @@ export default function EditPage() {
    * handleSave => asassembleFlat => PUT
    */
   const handleSave = async () => {
-    console.log("EditPage => handleSave => finalizeAndGetJSON");
+    console.log("EditPage => 1:handleSave => finalizeAndGetJSON");
     const updatedNested = finalizeAndGetJSON();
     if (!updatedNested) {
       setSnackbar({
@@ -195,9 +195,12 @@ export default function EditPage() {
       return;
     }
     try {
-      console.log("EditPage => handleSave s => AssembleFlatJSON");
+      console.log("EditPage => 2:handleSave => AssembleFlatJSON");
       const updatedFlat = assembleFlatJSON(updatedNested);
-      console.log("EditPage => handleSave2  => ready to send to PUT", flatJson.songID, updatedFlat);
+      console.log("EditPage => 3:handleSave => ready to send to PUT", updatedFlat);
+      console.log("Updated Flat JSON songId =>", updatedFlat.songInfo?.songId);
+      console.log("Updated Flat JSON full:", JSON.stringify(updatedFlat, null, 2));
+
       const resp = await fetch("/api/markers", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -231,7 +234,7 @@ export default function EditPage() {
     const updatedFlat = assembleFlatJSON(updatedNested);
     downloadJSONFile(
       updatedFlat,
-      `${updatedNested.songID || "Song"}_edited.json`,
+      `${updatedNested.songId || "Song"}_edited.json`,
     );
   };
 
@@ -273,7 +276,7 @@ export default function EditPage() {
       <Header />
 
       <Typography variant="h5" sx={{ mb: 1 }}>
-        Edit Page – {songData.songInfo?.songID || "NoSong"}
+        Edit Page – {songData.songInfo?.songId || "NoSong"}
       </Typography>
       <Typography variant="body2" sx={{ mb: 2 }}>
         isReady:{" "}

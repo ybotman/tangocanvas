@@ -128,8 +128,8 @@ export default function Page() {
         <Typography variant="h5">
           Selected Song:{" "}
           <strong>
-            {selectedSong?.songInfo?.songID
-              ? selectedSong.songInfo.songID
+            {selectedSong?.songInfo?.songId
+              ? selectedSong.songInfo.songId
               : "None"}
           </strong>
         </Typography>
@@ -139,9 +139,9 @@ export default function Page() {
       <Box className={styles.searchSection}>
         <Autocomplete
           options={songs}
-          // Example: songs[i].songInfo => { songID, state, ... }
+          // Example: songs[i].songInfo => { songId, state, ... }
           getOptionLabel={(option) => {
-            const sid = option.songInfo?.songID || "Unknown";
+            const sid = option.songInfo?.songId || "Unknown";
             const st = option.songInfo?.state?.join(", ") || "NoState";
             return `${sid} (${st})`;
           }}
@@ -156,9 +156,9 @@ export default function Page() {
             />
           )}
           autoHighlight
-          // Ensure the "same" item is recognized if the songID matches
+          // Ensure the "same" item is recognized if the songId matches
           isOptionEqualToValue={(opt, val) =>
-            opt.songInfo?.songID === val.songInfo?.songID
+            opt.songInfo?.songId === val.songInfo?.songId
           }
         />
 

@@ -1,6 +1,6 @@
 {
   "songInfo": {
-    "songID": "El Tarta",
+    "songId": "El Tarta",
     "orchestra": "UNK",
     "songPathFile": "/songs/El Tarta.mp3",
     "jsonPathFile": "/markers/El Tarta-markers.json",
