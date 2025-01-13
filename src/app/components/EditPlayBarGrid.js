@@ -89,7 +89,7 @@ export default function EditPlayBarGrid({
                         }}
                         onClick={() => handlePlay(bar, nextBar)}
                       >
-                        {bar.label} &gt; ({bar.id})
+                        Click: {bar.label}
                       </Typography>
 
                       {bar.id !== "Bar 1" && (

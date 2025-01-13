@@ -109,43 +109,51 @@ export default function useMarkerEditor(songData) {
    *   - Once we find barId, every bar after that gets newLen
    *   - Then update sections’ .start/.end
    */
-  const applyNewBarLengthAfterBar = useCallback((barId, newLen) => {
-    console.log("useMarkerEditor => applyNewBarLengthAfterBar =>", barId, newLen);
-    setSections((prevSecs) => {
-      const newSecs = JSON.parse(JSON.stringify(prevSecs));
+/**
+ * applyBarLengthFromBar(barId, newLen):
+ *   - Starting at the specified barId, set the new length for that bar and all subsequent bars.
+ *   - Updates each section's `.start` and `.end` boundaries after changes.
+ */
+const applyBarLengthFromBar = useCallback((barId, newLen) => {
+  console.log("useMarkerEditor => applyBarLengthFromBar =>", barId, newLen);
 
-      let found = false;
-      let lastEnd = null;
+  setSections((prevSecs) => {
+    const newSecs = JSON.parse(JSON.stringify(prevSecs));
 
-      for (const sec of newSecs) {
-        const markers = sec.markers || [];
-        for (let i = 0; i < markers.length; i++) {
-          const bar = markers[i];
-          if (!found) {
-            // If we haven’t found barId yet:
-            if (bar.id === barId) {
-              found = true;
-              lastEnd = bar.end; // store the bar’s end
-            }
-          } else {
-            // We have found => apply newLen
-            if (lastEnd !== null) {
-              bar.start = parseFloat(lastEnd.toFixed(2));
-              bar.end = parseFloat((bar.start + newLen).toFixed(2));
-            }
-            lastEnd = bar.end;
+    let found = false;
+    let lastEnd = null;
+
+    for (const sec of newSecs) {
+      const markers = sec.markers || [];
+      for (let i = 0; i < markers.length; i++) {
+        const bar = markers[i];
+        // If we have not yet found the starting bar
+        if (!found) {
+          if (bar.id === barId) {
+            found = true; // Start changes at this bar
+            lastEnd = bar.start; // Store this bar's start
           }
         }
-      }
-      if (!found) {
-        console.warn(`Bar ID: ${barId} was not found => no changes`);
-      }
 
-      // Update boundaries
-      updateSectionBoundaries(newSecs);
-      return newSecs;
-    });
-  }, []);
+        // If found, update this bar's length and position
+        if (found) {
+          bar.start = parseFloat(lastEnd.toFixed(2));
+          bar.end = parseFloat((bar.start + newLen).toFixed(2));
+          lastEnd = bar.end; // Move forward to the next bar's start
+        }
+      }
+    }
+
+    if (!found) {
+      console.warn(`Bar ID: ${barId} was not found => no changes applied`);
+    }
+
+    // Update each section's boundaries
+    updateSectionBoundaries(newSecs);
+    return newSecs;
+  });
+}, []);
+
 
   /**
    * finalizeAndGetJSON => merges local sections back into the original
@@ -160,7 +168,7 @@ export default function useMarkerEditor(songData) {
   return {
     sections,
     adjustBarTime,
-    applyNewBarLengthAfterBar,
+    applyBarLengthFromBar,
     finalizeAndGetJSON,
   };
 }

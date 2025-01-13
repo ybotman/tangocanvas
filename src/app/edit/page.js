@@ -159,7 +159,7 @@ export default function EditPage() {
   const {
     sections,
     finalizeAndGetJSON,
-    applyNewBarLengthAfterBar,
+    applyBarLengthFromBar,
     adjustBarTime,
   } = useMarkerEditor(songData || {});
 
@@ -238,7 +238,7 @@ export default function EditPage() {
     }
     const barId = afterBarNum;
     const newLen = parseFloat(barLenSeconds.toFixed(2));
-    applyNewBarLengthAfterBar(barId, newLen);
+    applyBarLengthFromBar(barId, newLen);
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -307,20 +307,20 @@ export default function EditPage() {
 
       <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
         <TextField
-          label="After Bar Number"
+          label="@Bar"
           variant="outlined"
           size="small"
           value={afterBarNum}
           onChange={(e) => setAfterBarNum(e.target.value)}
+          sx={{ width: 100 }} // Make the text field smaller
         />
-        <Button variant="contained" onClick={handleApplyBarLen}>
+        <Button variant="contained" size="small" onClick={handleApplyBarLen}>
           Apply
         </Button>
+      </Box>
+      <Box sx={{ mb: 2 }}>
         <Button variant="contained" onClick={handleSave}>
           Save Markers
-        </Button>
-        <Button variant="outlined" onClick={handleSaveAsFlat}>
-          Export JSON
         </Button>
       </Box>
 
@@ -331,7 +331,11 @@ export default function EditPage() {
           onAdjustBarTime={adjustBarTime}
           onPlayBar={(start, end) => handlePlayBar(start, end)}
         />
-      </Box>
+
+      <Button variant="outlined" onClick={handleSaveAsFlat}>
+          Export JSON
+        </Button>
+              </Box>
 
       <Snackbar
         open={snackbar.open}
