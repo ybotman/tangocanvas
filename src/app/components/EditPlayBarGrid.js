@@ -19,7 +19,7 @@ export default function EditPlayBarGrid({
   onAdjustBarTime,
   onPlayBar,
 }) {
-  console.log("entering EditPlayBarGrid with sections.length =", sections.length);
+  //console.log("entering EditPlayBarGrid with sections.length =", sections.length);
 
   /**
    * Shift the bar’s start time by ±0.1s.

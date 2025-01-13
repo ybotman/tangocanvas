@@ -33,7 +33,7 @@ export default function useMarkerEditor(songData) {
 
   /**
    * adjustBarTime(barId, delta):
-   *  1) If barId === "bar 1", do nothing.
+   *  1) If barId === "1", do nothing.
    *  2) Shift that bar’s start by ±delta => new end = new start + oldLength
    *  3) Set the previous bar’s .end to this bar’s .start
    *  4) Forward-ripple across all subsequent bars in all subsequent sections
@@ -58,10 +58,10 @@ export default function useMarkerEditor(songData) {
       // Find the bar
       const targetIndex = globalMarkers.findIndex((m) => m.id === barId);
       if (targetIndex < 0) {
-        console.info(`Bar ${barId} not found => no shift applied`);
+        console.info(`Bar : ${barId} not found => no shift applied`);
         return newSecs;
       }
-      if (barId === "Bar 1") {
+      if (barId === "1") {
         console.info("Bar 1 cannot shift => ignoring");
         return newSecs;
       }
@@ -138,7 +138,7 @@ export default function useMarkerEditor(songData) {
         }
       }
       if (!found) {
-        console.warn(`Bar ID ${barId} was not found => no changes`);
+        console.warn(`Bar ID: ${barId} was not found => no changes`);
       }
 
       // Update boundaries

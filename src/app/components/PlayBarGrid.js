@@ -25,7 +25,7 @@ export default function PlaybackGrid({ sections, onPlayBar }) {
   const snippetDuration = 4.5;
 
   useEffect(() => {
-    console.log("PlaybackGrid => useEffect for timer");
+    //console.log("PlaybackGrid => useEffect for timer");
     let timer = null;
     if (activeMarkerId) {
       setElapsed(0);
@@ -55,7 +55,7 @@ export default function PlaybackGrid({ sections, onPlayBar }) {
   }
 
   const handleBarClick = (bar) => {
-    console.log("PlaybackGrid => handleBarClick with bar.id =", bar.id);
+    //console.log("PlaybackGrid => handleBarClick with bar.id =", bar.id);
     setActiveMarkerId(bar.id);
     onPlayBar(bar);
   };
@@ -103,20 +103,6 @@ export default function PlaybackGrid({ sections, onPlayBar }) {
           </Box>
         );
       })}
-
-      {/* If a bar is playing, show progress */}
-      {activeMarkerId && (
-        <Box sx={{ mt: 2, width: "100%", maxWidth: 400 }}>
-          <LinearProgress
-            variant="determinate"
-            value={progressValue}
-            sx={{ height: 8, borderRadius: 4 }}
-          />
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            Playing snippet... {elapsed.toFixed(2)} / {snippetDuration} s
-          </Typography>
-        </Box>
-      )}
     </Box>
   );
 }

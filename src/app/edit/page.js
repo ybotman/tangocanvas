@@ -236,7 +236,7 @@ export default function EditPage() {
       console.warn("No bar number typed => skipping applyNewBarLen");
       return;
     }
-    const barId = `Bar ${afterBarNum}`;
+    const barId = afterBarNum;
     const newLen = parseFloat(barLenSeconds.toFixed(2));
     applyNewBarLengthAfterBar(barId, newLen);
   };

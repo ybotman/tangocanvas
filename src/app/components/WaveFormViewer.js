@@ -12,7 +12,7 @@ import PropTypes from "prop-types";
 import { Box } from "@mui/material";
 
 export default function WaveformViewer({ onInit }) {
-  console.log("entering WaveformViewer with onInit defined? =>", !!onInit);
+  //console.log("entering WaveformViewer with onInit defined? =>", !!onInit);
 
   const waveformRef = useRef(null);
   const timelineRef = useRef(null);
@@ -21,7 +21,7 @@ export default function WaveformViewer({ onInit }) {
   const hasInitRef = useRef(false);
 
   useEffect(() => {
-    console.log("WaveFormViewer => useEffect for onInit");
+    //console.log("WaveFormViewer => useEffect for onInit");
     if (onInit && !hasInitRef.current) {
       hasInitRef.current = true;
       onInit(waveformRef, timelineRef);
