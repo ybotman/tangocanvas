@@ -84,13 +84,7 @@ export default function useWaveSurfer({
         finalSnippet = dur - startSec;
       }
 
-      // Highlight region
-  //    ws.clearRegions();
-  //    ws.addRegion({
-  //      start: startSec,
-  //      end: startSec + finalSnippet,
-  //      color: "rgba(255, 0, 0, 0.15)",
-   //   });
+
 
       // Stop, then play
       ws.stop();

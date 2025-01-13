@@ -1,36 +1,43 @@
-//------------------------------------------------------------------------------
-//src/app/components/EditPlaybackGrid.js
-//------------------------------------------------------------------------------
+/**
+ * src/app/components/EditPlayBarGrid.js
+ *
+ * Provides a grid of bars for editing: shift times ±0.1s and snippet playback.
+ */
 
 "use client";
 
 import React from "react";
 import PropTypes from "prop-types";
-import { Box, Grid2, Typography, Divider, IconButton } from "@mui/material";
+import { Box, Typography, Divider, IconButton } from "@mui/material";
+import Grid2 from "@mui/material/Grid2";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-export default function EditPlaybackGrid({
+export default function EditPlayBarGrid({
   sections,
   onAdjustBarTime,
   onPlayBar,
 }) {
+  console.log("entering EditPlayBarGrid with sections.length =", sections.length);
+
   /**
-   * Shift the bar’s start time by ±0.1s, except if bar is "bar-1".
+   * Shift the bar’s start time by ±0.1s.
    */
   const handleShift = (bar, delta) => {
-    if (bar.id === "bar-1") {
-      console.info("Bar 1 cannot shift. Ignoring request.");
+    console.log("EditPlayBarGrid => handleShift => bar.id =", bar.id, delta);
+    if (bar.id === "Bar 1") {
+      console.info("EditPlayBarGrid => Bar 1 cannot shift => skip");
       return;
     }
     onAdjustBarTime(bar.id, delta);
   };
 
   /**
-   * Play from bar.start..bar.end, or up to the next bar’s start if desired.
+   * Play from bar.start..bar.end (or up to nextBar.start if desired).
    */
   const handlePlay = (bar, nextBar) => {
+    console.log("EditPlayBarGrid => handlePlay => Bar", bar, "nextBar", nextBar);
     if (nextBar) {
       onPlayBar(bar.start, nextBar.start);
     } else {
@@ -64,7 +71,7 @@ export default function EditPlaybackGrid({
                       gap: 0.2,
                     }}
                   >
-                    {/* ROW 1: Bar label (click) and Shift icons (right) */}
+                    {/* ROW 1: bar label, shift icons */}
                     <Box
                       sx={{
                         display: "flex",
@@ -85,7 +92,7 @@ export default function EditPlaybackGrid({
                         {bar.label} &gt; ({bar.id})
                       </Typography>
 
-                      {bar.id !== "bar-1" && (
+                      {bar.id !== "Bar 1" && (
                         <Box sx={{ display: "flex", gap: 0.5 }}>
                           <IconButton
                             size="small"
@@ -103,15 +110,13 @@ export default function EditPlaybackGrid({
                       )}
                     </Box>
 
-                    {/* ROW 2: start → end (duration) */}
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
-                      <Typography variant="body2" sx={{}}>
+                    {/* ROW 2: start..end */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Typography variant="body2">
                         {bar.start.toFixed(2)}s
                       </Typography>
                       <KeyboardArrowRightIcon fontSize="small" />
-                      <Typography variant="body2" sx={{}}>
+                      <Typography variant="body2">
                         {bar.end.toFixed(2)}s
                       </Typography>
                       <Typography
@@ -132,7 +137,7 @@ export default function EditPlaybackGrid({
   );
 }
 
-EditPlaybackGrid.propTypes = {
+EditPlayBarGrid.propTypes = {
   sections: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

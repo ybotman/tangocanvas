@@ -1,6 +1,12 @@
-/* --------------------------------------------
+/**
  * src/app/edit/page.js
- * --------------------------------------------
+ *
+ * - Fetch marker data in flat JSON format
+ * - Convert to nested JSON
+ * - Render WaveformViewer with onInit => initWaveSurfer
+ * - Auto-load MP3 once wave is ready
+ * - Show isReady / isPlaying
+ * - Use useMarkerEditor for marker editing
  */
 
 "use client";
@@ -9,55 +15,66 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
   Typography,
-  Button,
   Slider,
   TextField,
+  Button,
   Snackbar,
   Alert,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-
 import { useSongContext } from "@/context/SongContext";
+import useWaveSurfer from "@/hooks/useWaveSurfer";
+import { assembleNestedJSON, disassembleFlatJSON, downloadJSONFile } from "@/utils/jsonHandler";
 import useMarkerEditor from "@/hooks/useMarkerEditor";
-import { downloadJSONFile } from "@/utils/jsonHandler";
-import EditPlaybackGrid from "@/components/EditPlaybackGrid";
-
+import EditPlayBarGrid from "@/components/EditPlayBarGrid";
+import WaveformViewer from "@/components/WaveFormViewer";
+import Header from "@/components/Header";
 import styles from "./EditPage.module.css";
 
-/**
- * The Edit Page uses the single wave from context with #waveform.
- * Double-click or snippet logic is handled in context if needed.
- */
 export default function EditPage() {
-  const router = useRouter();
-  const {
-    selectedSong,
-    loadSong,
-    snippetPlayback, // if you want snippet approach
-    stopAudio,
-    cleanupWaveSurfer,
-  } = useSongContext();
+  console.log("entering EditPage");
 
-  // local states
+  const router = useRouter();
+  const { selectedSong } = useSongContext();
+
   const [songData, setSongData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState("");
 
-  // For the "bar length" cascade feature
+  // For auto-loading track once
+  const [autoLoaded, setAutoLoaded] = useState(false);
+
+  // UI states
   const [barLenSeconds, setBarLenSeconds] = useState(3.0);
   const [afterBarNum, setAfterBarNum] = useState("");
-
-  // Snackbar for success/error
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "info",
   });
 
+  // WaveSurfer
+  const waveformContainerRef = useRef(null);
+  const timelineContainerRef = useRef(null);
+  const {
+    isReady,
+    isPlaying,
+    initWaveSurfer,
+    loadSong,
+    playSnippet,
+    stopAudio,
+    cleanupWaveSurfer,
+  } = useWaveSurfer({
+    containerRef: waveformContainerRef,
+    timelineRef: timelineContainerRef,
+    enableClickableWaveform: true, // or false
+  });
+
   /**
-   * If no selectedSong => show error
+   * 1) If no selectedSong => show error
    */
   useEffect(() => {
+    console.log("EditPage => check selectedSong");
     if (!selectedSong) {
       setLoading(false);
       setErrMsg("No song selected. Please go back and select a song.");
@@ -65,49 +82,79 @@ export default function EditPage() {
   }, [selectedSong]);
 
   /**
-   * Fetch marker data for the chosen song
+   * 2) Fetch marker data => assemble => store in songData
    */
   useEffect(() => {
-    if (!selectedSong) return;
-
     async function loadMarkers() {
+      if (!selectedSong?.songInfo?.songPathFile) {
+        setErrMsg("No song file path found. Cannot load markers.");
+        return;
+      }
       setLoading(true);
-      setErrMsg("");
-      setSongData(null);
-
       try {
-        const baseName = selectedSong.filename.replace(/\.\w+$/, "");
-        const markerUrl = `/markers/${baseName}-markers.json`;
+        const filePath = selectedSong.songInfo.songPathFile; // e.g. "/songs/Germaine.mp3"
+        const baseName = filePath
+          .replace(/^\/songs\//, "")
+          .replace(/\.\w+$/, "");
+        const markerUrl = `/api/markers?songId=${encodeURIComponent(baseName)}`;
+
+        console.log("EditPage => fetching marker data =>", markerUrl);
         const resp = await fetch(markerUrl);
         if (!resp.ok) {
           throw new Error(`Failed to fetch markers: ${resp.status}`);
         }
-        const data = await resp.json();
-        setSongData(data);
+        const flatData = await resp.json();
+        const nestedData = await assembleNestedJSON(flatData);
+        setSongData(nestedData);
+        console.log("EditPage => nested marker data loaded");
       } catch (err) {
         setErrMsg(err.message || "Error fetching marker data.");
       } finally {
         setLoading(false);
       }
     }
-    loadMarkers();
+    if (selectedSong) {
+      loadMarkers();
+    }
   }, [selectedSong]);
 
   /**
-   * load the wave from context => #waveform
+   * 3) Clean up wave on unmount
    */
   useEffect(() => {
-    if (songData && !errMsg) {
-      const audioUrl = `/songs/${selectedSong.filename}`;
-      loadSong(audioUrl);
-    }
-    // On unmount => stop or cleanup wave
-    return () => stopAudio();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songData, errMsg]);
+    return () => {
+      console.log("EditPage => unmount => stop & cleanup wave");
+      stopAudio();
+      cleanupWaveSurfer();
+    };
+  }, [stopAudio, cleanupWaveSurfer]);
 
   /**
-   * Our marker editing hook
+   * 4) handleWaveformViewerInit => call initWaveSurfer once
+   */
+  const handleWaveformViewerInit = useCallback(
+    (waveRef, tRef) => {
+      console.log("EditPage => handleWaveformViewerInit => init wave");
+      waveformContainerRef.current = waveRef.current;
+      timelineContainerRef.current = tRef.current;
+      initWaveSurfer();
+    },
+    [initWaveSurfer],
+  );
+
+  /**
+   * 5) Auto-load the track once wave is ready & not yet loaded
+   */
+  useEffect(() => {
+    if (!autoLoaded && songData?.songInfo?.songPathFile) {
+      console.log("EditPage => auto-load track:", songData.songInfo.songPathFile);
+      loadSong(songData.songInfo.songPathFile);
+      setAutoLoaded(true);
+    }
+  }, [isReady, autoLoaded, songData, loadSong]);
+
+  /**
+   * useMarkerEditor for local marker editing
    */
   const {
     sections,
@@ -117,22 +164,26 @@ export default function EditPage() {
   } = useMarkerEditor(songData || {});
 
   /**
-   * snippet or bar playback. If you want double-click on the wave => do in context.
-   * This is just for the bar playback in the UI.
+   * snippet playback: play from start..end
    */
   const handlePlayBar = useCallback(
     (startSec, endSec) => {
-      snippetPlayback(startSec, endSec - startSec);
+      console.log("EditPage => handlePlayBar =>", startSec, endSec);
+      const length = endSec - startSec;
+      if (length > 0) {
+        playSnippet(startSec, length);
+      }
     },
-    [snippetPlayback],
+    [playSnippet],
   );
 
   /**
-   * Save Markers => PUT /api/markers
+   * handleSave => disassemble => PUT
    */
   const handleSave = async () => {
-    const updated = finalizeAndGetJSON();
-    if (!updated) {
+    console.log("EditPage => handleSave => finalizeAndGetJSON");
+    const updatedNested = finalizeAndGetJSON();
+    if (!updatedNested) {
       setSnackbar({
         open: true,
         message: "No marker data to save.",
@@ -141,10 +192,11 @@ export default function EditPage() {
       return;
     }
     try {
+      const updatedFlat = disassembleFlatJSON(updatedNested);
       const resp = await fetch("/api/markers", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updated),
+        body: JSON.stringify(updatedFlat),
       });
       const result = await resp.json();
       if (!resp.ok) {
@@ -165,38 +217,43 @@ export default function EditPage() {
   };
 
   /**
-   * Download older version of the JSON for local backups
+   * handleSaveAsFlat => local JSON backup
    */
-  const handleSaveOld = () => {
-    const updated = finalizeAndGetJSON();
-    if (!updated) return;
-    downloadJSONFile(updated, `${updated.songId || "Song"}_edited.json`);
+  const handleSaveAsFlat = () => {
+    console.log("EditPage => handleSaveAsFlat => export JSON");
+    const updatedNested = finalizeAndGetJSON();
+    if (!updatedNested) return;
+    const updatedFlat = disassembleFlatJSON(updatedNested);
+    downloadJSONFile(updatedFlat, `${updatedNested.songId || "Song"}_edited.json`);
   };
 
   /**
-   * applyNewBarLengthAfterBar => barId => bar-##, newLen => barLenSeconds
+   * handleApplyBarLen => "Bar <num>" => apply new length
    */
   const handleApplyBarLen = () => {
+    console.log("EditPage => handleApplyBarLen => afterBarNum:", afterBarNum);
     if (!afterBarNum) {
-      console.warn("No bar number typed!");
+      console.warn("No bar number typed => skipping applyNewBarLen");
       return;
     }
-    const barId = `bar-${afterBarNum}`;
-    const roundedLen = parseFloat(barLenSeconds.toFixed(2));
-    applyNewBarLengthAfterBar(barId, roundedLen);
+    const barId = `Bar ${afterBarNum}`;
+    const newLen = parseFloat(barLenSeconds.toFixed(2));
+    applyNewBarLengthAfterBar(barId, newLen);
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // RENDER
+  // Render
   // ─────────────────────────────────────────────────────────────────────────────
   if (loading) {
     return <Typography sx={{ p: 3 }}>Loading markers...</Typography>;
   }
   if (errMsg) {
     return (
-      <Typography sx={{ p: 3 }} color="error">
-        {errMsg}
-      </Typography>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h6" color="error">
+          {errMsg}
+        </Typography>
+      </Box>
     );
   }
   if (!songData) {
@@ -204,69 +261,78 @@ export default function EditPage() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.topSection}>
-        <Typography variant="h4" gutterBottom>
-          Edit: {selectedSong.filename}
+    <Box className={styles.container}>
+      <Header />
+
+      <Typography variant="h5" sx={{ mb: 1 }}>
+        Edit Page – {songData.songInfo?.songID || "NoSong"}
+      </Typography>
+      <Typography variant="body2" sx={{ mb: 2 }}>
+        isReady:{" "}
+        <strong style={{ color: isReady ? "green" : "red" }}>
+          {String(isReady)}
+        </strong>
+        {" | "}
+        isPlaying:{" "}
+        <strong style={{ color: isPlaying ? "green" : "red" }}>
+          {String(isPlaying)}
+        </strong>
+      </Typography>
+
+      {!isReady && (
+        <Typography sx={{ color: "orange", mb: 2 }}>
+          Waveform not ready – will auto-init. Hang tight...
         </Typography>
+      )}
 
-        {/* The wave container => #waveform */}
-        <Box
-          id="waveform"
-          sx={{
-            width: "100%",
-            height: 100,
-            backgroundColor: "#eee",
-            mb: 2,
-          }}
+      {/* Waveform container => calls handleWaveformViewerInit */}
+      <Box sx={{ display: isReady ? "block" : "none" }}>
+        <WaveformViewer onInit={handleWaveformViewerInit} />
+      </Box>
+
+      {/* Controls */}
+      <Box sx={{ mb: 2 }}>
+        <Typography gutterBottom>
+          Bar Length: {barLenSeconds.toFixed(2)} sec
+        </Typography>
+        <Slider
+          min={0.1}
+          max={6}
+          step={0.01}
+          value={barLenSeconds}
+          onChange={(_, val) => setBarLenSeconds(val)}
+          sx={{ width: 400 }}
         />
+      </Box>
 
-        {/* Bar length slider */}
-        <Box sx={{ mb: 2 }}>
-          <Typography gutterBottom>
-            Bar Length: {barLenSeconds.toFixed(2)} sec
-          </Typography>
-          <Slider
-            min={0.1}
-            max={6}
-            step={0.01}
-            value={barLenSeconds}
-            onChange={(_, val) => setBarLenSeconds(val)}
-            sx={{ width: 500 }}
-          />
-        </Box>
+      <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+        <TextField
+          label="After Bar Number"
+          variant="outlined"
+          size="small"
+          value={afterBarNum}
+          onChange={(e) => setAfterBarNum(e.target.value)}
+        />
+        <Button variant="contained" onClick={handleApplyBarLen}>
+          Apply
+        </Button>
+        <Button variant="contained" onClick={handleSave}>
+          Save Markers
+        </Button>
+        <Button variant="outlined" onClick={handleSaveAsFlat}>
+          Export JSON
+        </Button>
+      </Box>
 
-        {/* After Bar input => "12" => bar-12 */}
-        <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
-          <TextField
-            label="After Bar Number"
-            variant="outlined"
-            size="small"
-            value={afterBarNum}
-            onChange={(e) => setAfterBarNum(e.target.value)}
-          />
-          <Button variant="contained" onClick={handleApplyBarLen}>
-            Apply
-          </Button>
-          <Button variant="contained" onClick={handleSave}>
-            Save Markers
-          </Button>
-          <Button variant="outlined" onClick={handleSaveOld}>
-            Export JSON
-          </Button>
-        </Box>
-      </div>
-
-      {/* SCROLLABLE BARS */}
-      <div className={styles.barsScroll}>
-        <EditPlaybackGrid
+      {/* The bar grid editor */}
+      <Box className={styles.barsScroll}>
+        <EditPlayBarGrid
           sections={sections}
           onAdjustBarTime={adjustBarTime}
           onPlayBar={(start, end) => handlePlayBar(start, end)}
         />
-      </div>
+      </Box>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -281,6 +347,6 @@ export default function EditPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 }

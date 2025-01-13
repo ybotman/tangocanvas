@@ -8,7 +8,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
 import { useSongContext } from "@/context/SongContext";
-import PlaybackGrid from "@/components/PlaybackGrid";
+import PlaybackGrid from "@/components/PlayBarGrid";
 
 /**
  * The Verify page uses SongContext's single wave, loaded into #waveform.

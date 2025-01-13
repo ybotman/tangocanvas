@@ -6,7 +6,7 @@
     "songPathFile": "/songs/Germaine.mp3",
     "jsonPathFile": "/markers/Germaine-markers.json",
     "songDuration": 0,
-    "state": "Approved"
+    "state": "Matched"
   },
   "sections": [
     {
