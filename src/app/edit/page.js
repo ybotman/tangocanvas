@@ -100,7 +100,7 @@ export default function EditPage() {
         const baseName = filePath
           .replace(/^\/songs\//, "")
           .replace(/\.\w+$/, "");
-        const markerUrl = `/api/markers?songId=${encodeURIComponent(baseName)}`;
+        const markerUrl = `/api/markers?songID=${encodeURIComponent(baseName)}`;
 
         console.log("EditPage => fetching marker data =>", markerUrl);
         const resp = await fetch(markerUrl);
@@ -181,7 +181,7 @@ export default function EditPage() {
   );
 
   /**
-   * handleSave => disassemble => PUT
+   * handleSave => asassembleFlat => PUT
    */
   const handleSave = async () => {
     console.log("EditPage => handleSave => finalizeAndGetJSON");
@@ -195,7 +195,9 @@ export default function EditPage() {
       return;
     }
     try {
+      console.log("EditPage => handleSave s => AssembleFlatJSON");
       const updatedFlat = assembleFlatJSON(updatedNested);
+      console.log("EditPage => handleSave2  => ready to send to PUT", flatJson.songID, updatedFlat);
       const resp = await fetch("/api/markers", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -222,14 +224,14 @@ export default function EditPage() {
   /**
    * handleSaveAsFlat => local JSON backup
    */
-  const handleSaveAsFlat = () => {
-    console.log("EditPage => handleSaveAsFlat => export JSON");
+  const handleExportAsFlat = () => {
+    console.log("EditPage => handleExportAsFlat => export JSON");
     const updatedNested = finalizeAndGetJSON();
     if (!updatedNested) return;
     const updatedFlat = assembleFlatJSON(updatedNested);
     downloadJSONFile(
       updatedFlat,
-      `${updatedNested.songId || "Song"}_edited.json`,
+      `${updatedNested.songID || "Song"}_edited.json`,
     );
   };
 
@@ -338,7 +340,7 @@ export default function EditPage() {
           onPlayBar={(start, end) => handlePlayBar(start, end)}
         />
 
-        <Button variant="outlined" onClick={handleSaveAsFlat}>
+        <Button variant="outlined" onClick={handleExportAsFlat}>
           Export JSON
         </Button>
       </Box>

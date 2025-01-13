@@ -3,28 +3,28 @@ import { promises as fs } from "fs";
 import path from "path";
 
 /**
- * GET /api/markers?songId=<songId>
- *  1. If /public/markers/<songId>-markers.json does NOT exist => auto-create from /public/masterData/defaultSong.json
+ * GET /api/markers?songID=<songID>
+ *  1. If /public/markers/<songID>-markers.json does NOT exist => auto-create from /public/masterData/defaultSong.json
  *     - Overwrites defaultJson.songInfo => {songID, songPathFile, jsonPathFile, state = ["matched"], etc.}
- *  2. Finally read <songId>-markers.json and return it.
+ *  2. Finally read <songID>-markers.json and return it.
  *
- * Example: fetch("/api/markers?songId=Los Mareados") => returns the JSON for "Los Mareados-markers.json".
+ * Example: fetch("/api/markers?songID=Los Mareados") => returns the JSON for "Los Mareados-markers.json".
  */
 export async function GET(request) {
   console.log("GET /api/markers");
   try {
     const { searchParams } = new URL(request.url);
-    const songId = searchParams.get("songId");
-    if (!songId) {
+    const songID = searchParams.get("songID");
+    if (!songID) {
       return NextResponse.json(
-        { error: "Missing songId query param" },
+        { error: "Missing songID query param" },
         { status: 400 },
       );
     }
 
     // Paths
     const markersDir = path.join(process.cwd(), "public", "markers");
-    const markerFile = path.join(markersDir, `${songId}-markers.json`);
+    const markerFile = path.join(markersDir, `${songID}-markers.json`);
     let fileExists = false;
 
     // Check if the file exists
@@ -43,9 +43,9 @@ export async function GET(request) {
       const defaultJson = JSON.parse(defaultRaw);
 
       // 2) Overwrite relevant fields
-      defaultJson.songInfo.songID = songId;
-      defaultJson.songInfo.songPathFile = `/songs/${songId}.mp3`; // or .wav
-      defaultJson.songInfo.jsonPathFile = `/markers/${songId}-markers.json`;
+      defaultJson.songInfo.songID = songID;
+      defaultJson.songInfo.songPathFile = `/songs/${songID}.mp3`; // or .wav
+      defaultJson.songInfo.jsonPathFile = `/markers/${songID}-markers.json`;
       if (!defaultJson.songInfo.state) {
         defaultJson.songInfo.state = "matched"; // or any default state
       }
@@ -70,25 +70,25 @@ export async function GET(request) {
 
 /**
  * POST /api/markers
- *  - Body: { songId, ...markerData }
- *  - If <songId>-markers.json exists => 409
+ *  - Body: { songID, ...markerData }
+ *  - If <songID>-markers.json exists => 409
  *  - Otherwise => writes a brand-new file
  */
 export async function POST(request) {
   console.log("POST /api/markers");
   try {
     const body = await request.json();
-    const { songId, ...rest } = body;
+    const { songID, ...rest } = body;
 
-    if (!songId) {
+    if (!songID) {
       return NextResponse.json(
-        { error: "songId is required" },
+        { error: "songID is required" },
         { status: 400 },
       );
     }
 
     const markersDir = path.join(process.cwd(), "public", "markers");
-    const newFilePath = path.join(markersDir, `${songId}-markers.json`);
+    const newFilePath = path.join(markersDir, `${songID}-markers.json`);
 
     // If file exists => 409
     try {
@@ -103,7 +103,7 @@ export async function POST(request) {
 
     await fs.writeFile(
       newFilePath,
-      JSON.stringify({ songId, ...rest }, null, 2),
+      JSON.stringify({ songID, ...rest }, null, 2),
       "utf-8",
     );
 
@@ -119,35 +119,35 @@ export async function POST(request) {
 
 /**
  * PUT /api/markers
- *  - Body: { songId, ...markerData }
- *  - If <songId>-markers.json exists => rename old => <songId>-markersNN.json
- *  - Then writes new <songId>-markers.json
+ *  - Body: { songID, ...markerData }
+ *  - If <songID>-markers.json exists => rename old => <songID>-markersNN.json
+ *  - Then writes new <songID>-markers.json
  */
 export async function PUT(request) {
   console.log("PUT /api/markers");
 
   try {
     const body = await request.json();
-    const { songId, ...rest } = body;
-    console.log("PUT /api/markers =>", songId, rest, body);
+    const { songID, ...rest } = body;
+    console.log("PUT /api/markers =>", songID, rest, body);
 
-    if (!songId) {
+    if (!songID) {
       return NextResponse.json(
-        { error: "songId is required" },
+        { error: "songID is required" },
         { status: 400 },
       );
     }
 
     const markersDir = path.join(process.cwd(), "public", "markers");
-    const mainFilePath = path.join(markersDir, `${songId}-markers.json`);
+    const mainFilePath = path.join(markersDir, `${songID}-markers.json`);
 
     let maxVer = 0;
     let hasMainFile = false;
     try {
       const files = await fs.readdir(markersDir);
       files.forEach((file) => {
-        if (file.startsWith(`${songId}-markers`)) {
-          if (file === `${songId}-markers.json`) {
+        if (file.startsWith(`${songID}-markers`)) {
+          if (file === `${songID}-markers.json`) {
             hasMainFile = true;
           } else {
             // parse "markersNN.json"
@@ -166,7 +166,7 @@ export async function PUT(request) {
     if (hasMainFile) {
       // rename => version
       const oldVer = (maxVer + 1).toString().padStart(2, "0");
-      const newFile = path.join(markersDir, `${songId}-markers${oldVer}.json`);
+      const newFile = path.join(markersDir, `${songID}-markers${oldVer}.json`);
       await fs.rename(mainFilePath, newFile);
     } else {
       // if no main file => must create first
@@ -179,7 +179,7 @@ export async function PUT(request) {
     // write new
     await fs.writeFile(
       mainFilePath,
-      JSON.stringify({ songId, ...rest }, null, 2),
+      JSON.stringify({ songID, ...rest }, null, 2),
       "utf-8",
     );
 

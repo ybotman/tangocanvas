@@ -42,7 +42,7 @@ export function SongProvider({ children }) {
 
           // GET /api/markers? => auto-creates markers if missing
           const markerResp = await fetch(
-            `/api/markers?songId=${encodeURIComponent(baseName)}`,
+            `/api/markers?songID=${encodeURIComponent(baseName)}`,
           );
           if (!markerResp.ok) {
             console.warn(
@@ -98,25 +98,26 @@ export function SongProvider({ children }) {
   /**
    * 4) readMarkerData / saveMarkerData if needed
    */
-  async function readMarkerData(songId) {
-    const url = `/api/markers?songId=${encodeURIComponent(songId)}`;
+  async function readMarkerDataXXX(songID) {
+    const url = `/api/markers?songID=${encodeURIComponent(songID)}`;
     const resp = await fetch(url);
     if (!resp.ok) {
       throw new Error(`Failed GET /api/markers => ${resp.status}`);
     }
     const flatData = await resp.json();
-    console.log("SongContext => readMarkerData => flat:", flatData);
+    console.log("SongContext => readMarkerDataXXX => flat:", flatData);
 
     const nested = await assembleNestedJSON(flatData);
-    console.log("SongContext => readMarkerData => nested:", nested);
+    console.log("SongContext => readMarkerDataXXX => nested:", nested);
     return nested;
   }
 
-  async function saveMarkerData(nestedJson) {
+  async function saveMarkerDataXXX(nestedJson) {
+    console.log("SongContext => saveMarkerData => nested:", nestedJson);
     // disassemble => PUT
     const flatData = await assembleFlatJSON(nestedJson);
     const sid = nestedJson.songInfo?.songID || "Unknown";
-    flatData.songId = sid;
+    flatData.songID = sid;
 
     const resp = await fetch("/api/markers", {
       method: "PUT",
@@ -136,9 +137,8 @@ export function SongProvider({ children }) {
     error,
     selectedSong,
     setSelectedSong,
-    // optionally expose these if pages want them:
-    readMarkerData,
-    saveMarkerData,
+    readMarkerDataXXX,
+    saveMarkerDataXXX,
   };
 
   return <SongContext.Provider value={value}>{children}</SongContext.Provider>;

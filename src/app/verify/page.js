@@ -171,7 +171,7 @@ export default function VerifyPage() {
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h4" gutterBottom>
-        Verify Page – {markerData.songId || selectedSong.filename}
+        Verify Page – {markerData.songID || selectedSong.filename}
       </Typography>
 
       <Button

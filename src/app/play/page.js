@@ -94,7 +94,7 @@ export default function PlayPage() {
       try {
         const baseName = selectedSong.songInfo.songID;
         const resp = await fetch(
-          `/api/markers?songId=${encodeURIComponent(baseName)}`,
+          `/api/markers?songID=${encodeURIComponent(baseName)}`,
         );
         if (!resp.ok) {
           throw new Error(`Failed fetch => ${resp.status}`);

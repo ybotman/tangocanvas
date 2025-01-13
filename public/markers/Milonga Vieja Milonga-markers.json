@@ -8,7 +8,7 @@
     "songDuration": 0,
     "state": "Verified"
   },
-  "sections": [
+  "sectionsList": [
     {
       "id": 1,
       "type": "section",

@@ -8,7 +8,7 @@
     "songDuration": 0,
     "state": "Approved"
   },
-  "sections": [
+  "sectionsList": [
     {
       "id": 1,
       "type": "intro",

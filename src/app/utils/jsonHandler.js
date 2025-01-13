@@ -15,66 +15,77 @@ export function downloadJSONFile(jsonData, fileName = "updatedMarkers.json") {
 
 /**
  * assembleNestedJSON(flatJson)
- * Transforms "flatJSON" into "nestedJSON":
- *  - Builds `sections[].markers` from global bars[].
+ *
+ * 1) Reads the flat JSON, with "sectionsList" as the array of section metadata.
+ * 2) Builds "sections" by merging the "bars" data into each section's .markers.
+ * 3) Returns a nested structure that the app can use (i.e. "sections" with .markers).
+ *    The original "sectionsList" remains in the object if you need it for reference,
+ *    but the app will primarily look at "sections".
  */
 export async function assembleNestedJSON(flatJson) {
-  // Example structure:
-  // flatJson = {
-  //   songInfo: { songID, songDuration, ...},
-  //   sections: [{ id, startBarId, endBarId, ... }, ...],
-  //   bars: [{ id, start, end, label }, ...]
-  // }
-  console.log("flatJson assemble request", flatJson);
-  const { sections, bars } = flatJson;
-  if (!sections || !bars) return flatJson; // fallback
+  console.log("flatJson => assembleNestedJSON =>", flatJson);
 
-  const nestedSections = sections.map((sec) => {
+  // 1) Extract what we need
+  const { sectionsList, bars } = flatJson;
+  if (!Array.isArray(sectionsList) || !Array.isArray(bars)) {
+    console.warn(
+      "assembleNestedJSON => Missing sectionsList or bars. Returning flatJson directly."
+    );
+    return flatJson; // fallback, no transformation
+  }
+
+  // 2) Convert each item in sectionsList to a "section" with .markers
+  const nestedSections = sectionsList.map((sec) => {
+    // parse the numeric bar range
     const startNum = parseInt(sec.startBarId, 10);
     const endNum = parseInt(sec.endBarId, 10);
+
+    // find all bars that fall into [startNum..endNum]
     const markers = bars
       .filter((bar) => {
         const barNum = parseInt(bar.id, 10);
         return barNum >= startNum && barNum <= endNum;
       })
       .map((bar) => ({
-        id: bar.id, // "1", "2", etc.
+        id: bar.id,
         label: bar.label,
         start: bar.start,
         end: bar.end,
       }));
+
     return {
-      ...sec,
-      markers,
+      ...sec, // keep name, type, id, etc.
+      markers, // the nested markers array
     };
   });
 
+  // 3) Return the entire object, but add "sections" for the app
   return {
     ...flatJson,
-    sections: nestedSections,
+    sections: nestedSections, // the app uses "sections" with .markers
   };
 }
 
 /**
  * assembleFlatJSON(nestedJson)
  *
- * Converts "nested" data (what your app edits) back into the "flat" data structure
- * that you store on disk.
+ * Converts the nested data (the app's "sections" with .markers) back into
+ * the "flat" data on disk, which has "sectionsList" plus "bars".
  *
- *  - Copies `songInfo`, `Rhythms`, `chordNotation` from nested
- *  - Builds a top-level `bars` array from all sections[].markers
- *  - Builds a top-level `sections` array, setting each startBarId/endBarId
- *    from the first/last marker
- *  - Preserves any other top-level fields (like .bars, if it existed) by spreading
- *  - Inserts a top-level `songId` to please your server PUT usage
+ * Steps:
+ *  - read nestedJson.sections[] with .markers
+ *  - produce a top-level .bars array
+ *  - produce a .sectionsList array (like the old "sectionsList" in flat JSON)
+ *  - preserve other top-level fields (songInfo, Rhythms, chordNotation, etc.)
+ *  - add top-level "songID" for server usage
  */
 export async function assembleFlatJSON(nestedJson) {
-  console.log("nestedJson disassemble request", nestedJson);
+  console.log("nestedJson => assembleFlatJSON =>", nestedJson);
 
-  // 1) Clone so we don't mutate the original data
+  // 1) Clone so we don't mutate
   const result = JSON.parse(JSON.stringify(nestedJson));
 
-  // 2) Extract fields we know about
+  // 2) Destructure known fields
   const {
     songInfo = {},
     sections = [],
@@ -82,40 +93,38 @@ export async function assembleFlatJSON(nestedJson) {
     chordNotation = [],
   } = result;
 
-  // If no sections => just return the result
-  // (the user might not have sections or something)
+  // If no sections => do minimal transformation
   if (!Array.isArray(sections) || sections.length === 0) {
-    // Insert a top-level "songId" from the nested "songInfo.songID" (if it exists)
     const sid = songInfo?.songID || "UnknownSong";
-    result.songId = sid;
+    result.songID = sid;
     return result;
   }
 
-  // 3) We'll gather all bars from each nested section[].markers
+  // We'll gather all bars from each "section[].markers"
   const barsMap = {};
 
-  // 4) Create a new "flatSections" array that references bar IDs
-  const flatSections = sections.map((sec) => {
-    // Make sure we have markers
+  // We'll rebuild sectionsList from each "section"
+  const flatSectionsList = sections.map((sec) => {
+    // if no markers, fallback
     const markers = Array.isArray(sec.markers) ? sec.markers : [];
     if (markers.length === 0) {
-      // If no markers => startBarId/endBarId = "0"
       return {
         ...sec,
+        // remove the nested markers
         markers: undefined,
         startBarId: "0",
         endBarId: "0",
       };
     }
 
-    // Sort markers by .start time
-    const sortedMarkers = [...markers].sort((a, b) => a.start - b.start);
+    // Sort markers by .start
+    const sortedMarkers = markers.slice().sort((a, b) => a.start - b.start);
 
-    // The first & last bar in this section
+    // first & last bar => startBarId, endBarId
     const startBarId = sortedMarkers[0].id;
     const endBarId = sortedMarkers[sortedMarkers.length - 1].id;
 
-    // Collect all bars from this section => barsMap
+    // Accumulate all bars
     sortedMarkers.forEach((bar) => {
       barsMap[bar.id] = {
         id: bar.id,
@@ -125,68 +134,44 @@ export async function assembleFlatJSON(nestedJson) {
       };
     });
 
-    // Remove the nested "markers" array, store just startBarId/endBarId
     return {
       ...sec,
-      markers: undefined,
+      markers: undefined, // remove nested
       startBarId,
       endBarId,
-
-      // Optionally recalc startTime/endTime from the first & last marker
+      // recalc startTime / endTime from first/last marker
       startTime: sortedMarkers[0].start,
       endTime: sortedMarkers[sortedMarkers.length - 1].end,
     };
   });
 
-  // 5) Flatten barsMap into a bars[] array, sorted by start
+  // Flatten bars => barsArray
   const barsArray = Object.values(barsMap).sort((a, b) => a.start - b.start);
 
-  // 6) Build final flat JSON
-  //    - Keep "songInfo", "Rhythms", "chordNotation" from nested
-  //    - Overwrite "sections" with flatSections
-  //    - Overwrite "bars" with barsArray
+  // Now build final "flat" object with the new fields
   const flatJson = {
-    // Spread all top-level fields from nestedJson, so we keep e.g. "songInfo", "Rhythms"
-    ...nestedJson,
-
-    // Overwrite these with our newly built arrays
-    sections: flatSections,
-    bars: barsArray,
-
-    // Ensure these exist even if they were empty
+    ...nestedJson, // keep other top-level fields (songInfo, etc.)
+    sectionsList: flatSectionsList, // rename "sections" => "sectionsList"
+    bars: barsArray,                // gather all bars
     Rhythms,
     chordNotation,
   };
 
-  // 7) Insert a top-level "songId" from songInfo
+  // add top-level "songID" from songInfo
   const sid = songInfo?.songID || "UnknownSong";
-  flatJson.songId = sid;
+  flatJson.songID = sid;
+
+  // You may optionally remove the old "sections" field if you don't want it in the final JSON:
+  delete flatJson.sections; // if you want to remove "sections"
 
   console.log("assembleFlatJSON => final FLAT =>", flatJson);
   return flatJson;
 }
 
 /**
- * copyDefaultMarkerFile(songId)
- * Copies /public/masterData/defaultSong.json => /public/markers/<songId>-markers.json
+ * Optionally, any Node-based code here must run on the server, so if
+ * you use "fs" or "path", that logic must live in a server environment,
+ * not in a "use client" file.
+ *
+ * copyDefaultMarkerFile(songID) => ...
  */
-export async function copyDefaultMarkerFile(songId) {
-  const masterDir = path.join(process.cwd(), "public", "masterData");
-  const defaultPath = path.join(masterDir, "defaultSong.json");
-  const markersDir = path.join(process.cwd(), "public", "markers");
-  const newFilePath = path.join(markersDir, `${songId}-markers.json`);
-
-  // read default
-  const defaultRaw = await fs.readFile(defaultPath, "utf-8");
-  const defaultJson = JSON.parse(defaultRaw);
-
-  // rename inside JSON if needed
-  defaultJson.songInfo.songID = songId;
-  console.log("Building defaultSong.json to", newFilePath);
-  await fs.writeFile(
-    newFilePath,
-    JSON.stringify(defaultJson, null, 2),
-    "utf-8",
-  );
-  return true;
-}

@@ -133,7 +133,7 @@ export default function AutoGenPage() {
   /**
    * Helper: buildSongJson
    */
-  const buildSongJson = (songId, sec1, sec2, dur) => {
+  const buildSongJson = (songID, sec1, sec2, dur) => {
     // Example logic
     const hasIntro = sec1 > 0.3;
     const sections = [];
@@ -166,8 +166,8 @@ export default function AutoGenPage() {
       });
     }
     return {
-      songId,
-      title: songId,
+      songID,
+      title: songID,
       duration: dur,
       sections,
     };
