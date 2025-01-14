@@ -1,134 +1,198 @@
-/* --------------------------------------------
- * src/app/verify/page.js
- * --------------------------------------------
- */
-
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Box, Typography, Button, Snackbar, Alert } from "@mui/material";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useSongContext } from "@/context/SongContext";
+import useWaveSurfer from "@/hooks/useWaveSurfer";
+import { assembleNestedJSON, assembleFlatJSON } from "@/utils/jsonHandler";
 import PlaybackGrid from "@/components/PlayBarGrid";
+import WaveformViewer from "@/components/WaveFormViewer";
+import Beyond from "@/components/Beyond"; // optional if you want the "beyond" input
+import Header from "@/components/Header";
+import styles from "@/styles/Page.module.css";
 
-/**
- * The Verify page uses SongContext's single wave, loaded into #waveform.
- * We do not create a local wave. We simply call loadSong(...) from context.
- */
 export default function VerifyPage() {
-  const {
-    songs,
-    selectedSong,
-    setSelectedSong,
-    loadSong,
-    snippetPlayback,
-    cleanupWaveSurfer,
-    error: contextError,
-  } = useSongContext();
+  console.log("entering VerifyPage");
 
+  const router = useRouter();
+  const { selectedSong } = useSongContext();
+
+  // Marker data once fetched
   const [markerData, setMarkerData] = useState(null);
   const [songLoading, setSongLoading] = useState(true);
   const [songError, setSongError] = useState("");
 
-  // For the Approve button feedback
+  // For auto-loading the track only once
+  const [autoLoaded, setAutoLoaded] = useState(false);
+
+  // Optional “seconds beyond” input
+  const [beyondSec, setBeyondSec] = useState(0);
+
+  // Snackbar
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "info",
   });
 
+  // WaveSurfer references
+  const waveformContainerRef = useRef(null);
+  const timelineContainerRef = useRef(null);
+
+  // Our local wave Surfer hook
+  const {
+    isReady,
+    isPlaying,
+    initWaveSurfer,
+    loadSong,
+    playSnippet,
+    stopAudio,
+    cleanupWaveSurfer,
+  } = useWaveSurfer({
+    containerRef: waveformContainerRef,
+    timelineRef: timelineContainerRef,
+    enableClickableWaveform: true,
+  });
+
   /**
-   * 1) If no selectedSong => attempt to restore from localStorage, or error out
+   * 1) If no selectedSong => show error
    */
   useEffect(() => {
+    console.log("VerifyPage => check selectedSong");
     if (!selectedSong) {
-      const lastSong = localStorage.getItem("lastSelectedSong");
-      if (lastSong && songs.length > 0) {
-        const found = songs.find((s) => s.filename === lastSong);
-        if (found) {
-          setSelectedSong(found);
-          return;
-        }
-      }
-      setSongError("No song selected. Please return to the main page.");
+      setSongError("No song selected. Return to main page.");
       setSongLoading(false);
     }
-  }, [selectedSong, songs, setSelectedSong]);
+  }, [selectedSong]);
 
   /**
-   * 2) Once we have a valid selectedSong, fetch marker data
+   * 2) On unmount => cleanup wave
    */
   useEffect(() => {
-    if (!selectedSong) return;
-    async function loadMarkerData() {
+    console.log("VerifyPage => unmount => cleanupWaveSurfer");
+    return () => {
+      stopAudio();
+      cleanupWaveSurfer();
+    };
+  }, [stopAudio, cleanupWaveSurfer]);
+
+  /**
+   * 3) Once user picks a song => fetch marker data => markerData
+   */
+  useEffect(() => {
+    console.log("VerifyPage => doFetch marker data");
+    async function doFetch() {
+      if (!selectedSong?.songInfo?.songId) {
+        return;
+      }
       setSongLoading(true);
-      setSongError("");
-      setMarkerData(null);
-
       try {
-        const baseName = selectedSong.filename.replace(/\.\w+$/, "");
-        const audioUrl = `/songs/${selectedSong.filename}`;
-        const markerUrl = `/markers/${baseName}-markers.json`;
-
-        // Fetch marker JSON
-        const resp = await fetch(markerUrl);
+        const baseName = selectedSong.songInfo.songId;
+        const resp = await fetch(`/api/markers?songId=${encodeURIComponent(baseName)}`);
         if (!resp.ok) {
-          throw new Error(
-            `Failed to load marker JSON at ${markerUrl} (${resp.status})`,
-          );
+          throw new Error(`Failed fetch => ${resp.status}`);
         }
-        const data = await resp.json();
-        data.audioUrl = audioUrl;
-        setMarkerData(data);
+        const flat = await resp.json();
+        const nested = await assembleNestedJSON(flat);
+        setMarkerData(nested);
       } catch (err) {
-        setSongError(err.message || "Error fetching marker data.");
+        setSongError(err.message);
       } finally {
         setSongLoading(false);
       }
     }
-    loadMarkerData();
+    if (selectedSong) {
+      doFetch();
+    }
   }, [selectedSong]);
 
   /**
-   * 3) Once markerData is loaded, wave is created in context referencing #waveform
-   *    => loadSong() with the audio URL. Then we can snippet-play from context.
+   * 3b) Once markerData is loaded, auto-load the track if wave is inited
    */
   useEffect(() => {
-    if (!songLoading && markerData && !songError) {
-      const audioUrl = `/songs/${selectedSong.filename}`;
-      loadSong(audioUrl);
+    if (
+      !autoLoaded &&
+      markerData?.songInfo?.songPathFile &&
+      waveformContainerRef.current
+    ) {
+      console.log("VerifyPage => auto-loading the track...");
+      loadSong(markerData.songInfo.songPathFile);
+      setAutoLoaded(true);
     }
-
-    // Cleanup wave on unmount
-    return () => cleanupWaveSurfer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songLoading, markerData, songError]);
+  }, [autoLoaded, markerData, loadSong]);
 
   /**
-   * 4) snippet playback from a bar
+   * 4) handleWaveformViewerInit => call initWaveSurfer once
+   */
+  const handleWaveformViewerInit = useCallback(
+    (waveRef, tRef) => {
+      console.log("VerifyPage => handleWaveformViewerInit => waveRef, tRef", waveRef, tRef);
+      waveformContainerRef.current = waveRef.current;
+      timelineContainerRef.current = tRef.current;
+      initWaveSurfer();
+    },
+    [initWaveSurfer],
+  );
+
+  /**
+   * 5) snippet playback for a bar
    */
   const handlePlayBar = (bar) => {
-    if (!markerData) return;
-    snippetPlayback(bar.start, 4.5);
+    console.log("VerifyPage => handlePlayBar => bar:", bar);
+    if (!markerData?.songInfo?.songPathFile) return;
+
+    // snippet length from bar
+    const snippetLen = bar.end - bar.start;
+    const start = bar.start;
+
+    // pass beyondSec from local state
+    playSnippet(start, snippetLen, beyondSec);
+
+    setSnackbar({
+      open: true,
+      message: `Playing snippet from ${start.toFixed(2)} to ${bar.end.toFixed(
+        2
+      )} + beyond(${beyondSec}s)`,
+      severity: "success",
+    });
   };
 
   /**
-   * 5) Approve => /api/approveSong
+   * 6) Handler: Approve => sets state="Approved" (example),
+   *    then PUT /api/markers with updated JSON
    */
   const handleApprove = async () => {
-    if (!selectedSong) return;
+    if (!markerData) return;
+    console.log("VerifyPage => handleApprove => set state=Approved");
     try {
-      const resp = await fetch("/api/approveSong", {
-        method: "POST",
+      // 1) Mark in-memory
+      const newData = { ...markerData };
+      newData.songInfo = {
+        ...newData.songInfo,
+        state: "Approved",
+      };
+
+      // 2) Convert to FLAT => PUT /api/markers
+      const flat = await assembleFlatJSON(newData);
+      const resp = await fetch("/api/markers", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: selectedSong.filename }),
+        body: JSON.stringify(flat),
       });
       const result = await resp.json();
       if (!resp.ok) {
-        throw new Error(result.error || "Failed to approve song");
+        throw new Error(result.error || "Failed to update markers");
       }
       setSnackbar({
         open: true,
-        message: result.message || "Song approved!",
+        message: "Song state set to 'Approved'!",
         severity: "success",
       });
     } catch (err) {
@@ -141,39 +205,52 @@ export default function VerifyPage() {
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // RENDER
+  // Render
   // ─────────────────────────────────────────────────────────────────────────────
 
   if (songLoading) {
-    return <Typography sx={{ p: 3 }}>Loading markers...</Typography>;
+    return <Typography sx={{ p: 3 }}>Loading marker data...</Typography>;
   }
-
-  if (songError || contextError) {
+  if (songError) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
-          {songError || contextError}
+          {songError}
         </Typography>
       </Box>
     );
   }
-
   if (!markerData) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
-          Marker data not found or empty.
+          Marker data not found.
         </Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box className={styles.container} sx={{ p: 2 }}>
+      <Header />
+
       <Typography variant="h4" gutterBottom>
-        Verify Page – {markerData.songId || selectedSong.filename}
+        Verify Page – {markerData.songInfo?.songId || "NoSong"}
       </Typography>
 
+      <Typography variant="body2" sx={{ mb: 2 }}>
+        isReady:{" "}
+        <strong style={{ color: isReady ? "green" : "red" }}>
+          {String(isReady)}
+        </strong>
+        {" | "}
+        isPlaying:{" "}
+        <strong style={{ color: isPlaying ? "green" : "red" }}>
+          {String(isPlaying)}
+        </strong>
+      </Typography>
+
+      {/* Approve button => sets state="Approved" in marker JSON */}
       <Button
         variant="contained"
         color="success"
@@ -183,21 +260,41 @@ export default function VerifyPage() {
         Approve This Song
       </Button>
 
-      {/* The wave container from context => #waveform */}
-      <Box
-        id="waveform"
-        sx={{
-          width: "100%",
-          height: 100,
-          backgroundColor: "#eee",
-          mb: 2,
-        }}
-      />
+      {/* Optional "seconds beyond" input => default 0..30 */}
+      <Box sx={{ mb: 2 }}>
+        <Beyond
+          label="Beyond"
+          value={beyondSec}
+          onChange={(val) => setBeyondSec(val)}
+          min={0}
+          max={30}
+        />
+      </Box>
 
-      <PlaybackGrid
-        sections={markerData.sections || []}
-        onPlayBar={handlePlayBar}
-      />
+      {/* Waveform container => calls handleWaveformViewerInit */}
+      {!isReady && (
+        <Typography sx={{ color: "orange", mb: 2 }}>
+          Waveform not ready – please wait...
+        </Typography>
+      )}
+      <Box sx={{ display: isReady ? "block" : "none", mb: 2 }}>
+        <WaveformViewer onInit={handleWaveformViewerInit} />
+        <Button
+          variant="outlined"
+          disabled={!isPlaying}
+          onClick={() => stopAudio()}
+        >
+          Stop
+        </Button>
+      </Box>
+
+      {/* PlaybackGrid => bar snippet playback */}
+      {isReady && (
+        <PlaybackGrid
+          sections={markerData.sections || []}
+          onPlayBar={handlePlayBar}
+        />
+      )}
 
       <Snackbar
         open={snackbar.open}
@@ -206,9 +303,8 @@ export default function VerifyPage() {
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
         >
           {snackbar.message}
         </Alert>
